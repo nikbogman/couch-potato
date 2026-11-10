@@ -260,33 +260,35 @@
 }
 
 :global(.remote) .actions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex-wrap: wrap;
   width: auto;
   gap: 10px;
   margin-top: 8px;
 }
 
-:global(.remote) .actions > :not(.toggle) {
-  grid-column: 1 / -1;
-}
-
+/* Play takes the rest of the line; the icon squares sit beside it; notes wrap below. */
 :global(.remote) .play {
+  flex: 1;
   justify-content: center;
   height: 52px;
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-4);
   font-size: 16px;
 }
 
-:global(.remote) .toggle,
-:global(.remote) .square {
-  flex-direction: column;
-  gap: 4px;
-  width: auto;
-  height: 64px;
-  padding: 0 8px;
+:global(.remote) .toggle {
+  height: 52px;
+  padding: 0 var(--space-4);
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 15px;
+}
+
+:global(.remote) .square {
+  width: 52px;
+  padding: 0;
+}
+
+:global(.remote) .aside {
+  flex-basis: 100%;
 }
 
 :global(.remote) .aside {

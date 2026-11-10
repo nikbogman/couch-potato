@@ -1,22 +1,19 @@
 import { toggle, useChangeEntry, useEntry, type List, type MediaType } from "../lib/collection";
-import { useRemote } from "../remote/RemoteContext";
 import { ListIcon } from "./ListBadge";
 import { heroAction } from "./TitleHero";
 
 const LABELS: Record<List, string> = { to_watch: "To watch", watched: "Watched", favourites: "Favourite" };
 
 /**
- * To watch / Watched / Favourite for a title page. On the TV they are icon-only squares (designs: TV · Title, the heart);
- * on the phone, icon over label. `only` limits which show (TV Home's hero has Watched alone, labelled).
+ * To watch / Watched / Favourite for a title page: icon-only squares beside Play (designs: TV · Title, the heart). `only` limits which show (TV Home's hero has Watched alone, labelled).
  * One save at a time: all are disabled while it runs. Hidden until the entry loads.
  */
 export function ListToggles({ mediaType, id, only, labelled }: { mediaType: MediaType; id: number; only?: List[]; labelled?: boolean }) {
-  const remote = useRemote();
   const { data: entry, isError } = useEntry(mediaType, id);
   const change = useChangeEntry(mediaType, id);
   if (!entry) return isError ? <span className={heroAction.aside}>Lists unavailable</span> : null;
   const on = (l: List) => (l === "favourites" ? entry.favourite : entry.status === l);
-  const showLabel = labelled || !!remote;
+  const showLabel = !!labelled; // icon-only next to Play, on the TV and the phone
   return (
     <>
       {(only ?? (["to_watch", "watched", "favourites"] as List[])).map((l) => (

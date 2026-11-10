@@ -39,8 +39,8 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
             {resume ? "Resume" : "Play"} S{next.season} · E{next.episode}
           </PlayButton>
         )}
-        <NoTvNote className={heroAction.aside} />
         <ListToggles mediaType="tv" id={s.id} />
+        <NoTvNote className={heroAction.aside} />
         {resume && <span className={heroAction.aside}>{timeLeft(resume.position, resume.duration)}</span>}
       </TitleHero>
       {season !== undefined && (

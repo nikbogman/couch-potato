@@ -326,3 +326,8 @@
   background: var(--surface-2);
   font-size: 14px;
 }
+
+:global(.remote) .selected {
+  background: var(--text);
+  color: var(--ink);
+}
