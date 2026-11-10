@@ -4,7 +4,7 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-11-01",
   // Secrets (not here): TMDB_API_KEY, COUCH_PASSWORD. Locally they come from .dev.vars.
-  "build": { "command": "bun run build", "watch_dir": "src" },
+  "build": { "command": "bun run build", "watch_dir": "ui" },
   "assets": {
     "directory": "dist",
     "binding": "ASSETS",

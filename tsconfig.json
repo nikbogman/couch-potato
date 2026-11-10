@@ -13,5 +13,5 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["server", "shared", "src"]
+  "include": ["server", "shared", "ui"]
 }

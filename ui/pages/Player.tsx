@@ -1,7 +1,8 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMovie, fetchNextEpisode, fetchProgress, fetchSeries } from "../lib/api";
+import { fetchMovie, fetchNextEpisode, fetchProgress, fetchSeason, fetchSeries } from "../lib/api";
+import { usePhoneConnected } from "../remote/TvClient";
 import { type Target } from "../../shared/types";
 import { createPlaybackState, createStateReporter } from "../player/playbackState";
 import { type NowPlaying, type PlaybackCommand, type RemoteCommand } from "../../shared/playback";
@@ -16,6 +17,14 @@ import { type PlayerId } from "../../shared/types";
 import { usePlayerProgress } from "../player/usePlayerProgress";
 import { PageMessage } from "../components/Status";
 import styles from "./Player.module.css";
+
+/** The toast for a phone command, or null for ones that show for themselves (switch, stop, next, volume). */
+export function phoneToast(cmd: RemoteCommand, playingAfter: boolean): string | null {
+  if (cmd.cmd === "play" || cmd.cmd === "pause" || cmd.cmd === "togglePlay") return playingAfter ? "Playing from phone" : "Paused from phone";
+  if (cmd.cmd === "seekBy") return `${cmd.delta < 0 ? "Back" : "Forward"} ${Math.abs(cmd.delta)} s from phone`;
+  if (cmd.cmd === "seekTo") return "Moved from phone";
+  return null;
+}
 
 const STARTUP_MS = 15_000; // how long after a load the player gets its one "is it really playing?" check
 const NOTE_MS = 6000; // how long the "switched" note stays (it fades over the same time)
@@ -45,6 +54,17 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     staleTime: 5 * 60_000,
     retry: false,
   });
+  // The episode's own name, for the band's title line (shared with the series page's cache).
+  const { data: episodes } = useQuery({
+    queryKey: ["progress", "tv", id, "season", season],
+    queryFn: () => fetchSeason(id, season!),
+    enabled: isTv,
+    gcTime: 0,
+  });
+  const episodeName = episodes?.find((e) => e.episode === episode)?.name;
+  const phone = usePhoneConnected();
+  // Fullscreen (from the phone, or F on a keyboard): our band hides so the video fills the screen.
+  const [full, setFull] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
   const playback = useState(createPlaybackState)[0];
   // What the iframe was loaded with. It must not follow the URL: auto-next moves the URL and the video plays on.
@@ -80,8 +100,8 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   // the phone has no click behind it), so we ask its real status once and start it if it is paused.
   const starting = useRef(false);
   // What the phone is shown. Read through a ref so the reporter (made once) always sees the latest title, player and episode.
-  const live = useRef({ target, title, art, canNext: !!next, player });
-  live.current = { target, title, art, canNext: !!next, player };
+  const live = useRef({ target, title, art, canNext: !!next, player, full });
+  live.current = { target, title, art, canNext: !!next, player, full };
   const reporter = useState(() =>
     createStateReporter(() => {
       const l = live.current;
@@ -93,6 +113,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
         ...playback.get(),
         player: l.player,
         canNext: l.canNext,
+        fullscreen: l.full,
       };
       tvBridge.push(state);
     }),
@@ -133,7 +154,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   }, [loaded]);
   useEffect(() => {
     if (loaded) reporter.push();
-  }, [loaded, title, art, next, here]);
+  }, [loaded, title, art, next, here, full]);
   const fallBack = useEffectEvent(() => {
     const at = switchTo("playertwo");
     if (at !== null) setNote(`Player 1 didn't respond, switched to player 2 at ${mmss(at)}`);
@@ -168,14 +189,22 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     top?.postMessage(payload, "*");
     if (events && events !== top) events.postMessage(payload, "*");
   };
+  const goNext = () => next && void leave().then(() => navigate({ pathname: watchPath({ mediaType: "tv", id, ...next }), search }));
+  const toggleFull = () => {
+    const on = !full;
+    setFull(on);
+    // Browsers usually allow this only after a press on the TV itself; the hidden band is the part that always works.
+    if (on) document.documentElement.requestFullscreen?.().catch(() => {});
+    else if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  };
   const run = useEffectEvent((cmd: RemoteCommand) => {
     if (cmd.cmd === "stop") back();
+    else if (cmd.cmd === "fullscreen") toggleFull();
     else if (cmd.cmd === "switchPlayer") {
       setNote(null);
       switchTo(cyclePlayer(wanted.current));
-    } else if (cmd.cmd === "nextEpisode") {
-      if (next) void leave().then(() => navigate({ pathname: watchPath({ mediaType: "tv", id, ...next }), search }));
-    } else if (loaded) {
+    } else if (cmd.cmd === "nextEpisode") goNext();
+    else if (loaded) {
       // Before the page has loaded nothing can take the command, so it must not look done on the phone either.
       starting.current = false; // a deliberate command settles what the viewer wants
       post(cmd); // before the local state moves: the adapter works from the position and play state as they were
@@ -188,7 +217,13 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     post({ cmd: "getStatus" }); // the player's answer is a status event, which pushes state again
     reporter.push();
   });
-  useEffect(() => tvBridge.attach({ run, sync }), []);
+  // A command from the phone gets a short toast, so the room sees it landed.
+  const fromPhone = useEffectEvent((cmd: RemoteCommand) => {
+    run(cmd);
+    const said = phoneToast(cmd, playback.get().playing);
+    if (said) setNote(said);
+  });
+  useEffect(() => tvBridge.attach({ run: (cmd) => fromPhone(cmd), sync }), []);
 
   // Controller. Gamepad data only reaches this page while it has focus, so after every command we take focus back from the iframe.
   const refocusParent = () => {
@@ -203,7 +238,8 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     const c = playbackFor(a);
     if (c === "back") back();
     else if (c === "menu") {
-      if (inBar() && el instanceof HTMLElement) el.blur();
+      if (full) setFull(false); // Menu brings the band back
+      else if (inBar() && el instanceof HTMLElement) el.blur();
       else group.current?.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
     } else if (c) {
       run(c);
@@ -212,6 +248,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   });
   const onKey = useEffectEvent((e: KeyboardEvent) => {
     if (e.key === "Escape" || e.key === "Backspace") back();
+    else if ((e.key === "f" || e.key === "F") && !inBar()) toggleFull();
   });
   useEffect(() => {
     const key = (e: KeyboardEvent) => onKey(e);
@@ -222,47 +259,66 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   const t = loaded?.target;
   return (
     <div className={styles.player}>
-      <div ref={bar} data-bar className={styles.bar}>
-        <button type="button" className={styles.back} onClick={back} aria-label="Back">
-          <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 5l-7 7 7 7" />
-          </svg>
-        </button>
-        <div
-          ref={group}
-          className={styles.switch}
-          role="radiogroup"
-          aria-label="Player"
-          onKeyDown={(e) => {
-            if (!e.key.startsWith("Arrow")) return;
-            e.preventDefault();
-            switchTo(cyclePlayer(wanted.current, e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1));
-          }}
-        >
-          <span aria-hidden="true" className={styles.switchLabel}>
-            Player
-          </span>
-          {PLAYER_IDS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="radio"
-              aria-checked={p === player}
-              tabIndex={p === player ? 0 : -1}
-              className={p === player ? styles.active : ""}
-              onClick={() => {
-                setNote(null);
-                switchTo(p);
-              }}
-            >
-              {ADAPTERS[p].label}
-            </button>
-          ))}
+      <div ref={bar} data-bar className={styles.bar} hidden={full}>
+        <div className={styles.lead}>
+          <button type="button" className={styles.back} onClick={back} aria-label="Back to title">
+            <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <div className={styles.heading}>
+            {isTv && (
+              <span className={styles.eyebrow}>
+                {title} · S{season} · E{episode}
+              </span>
+            )}
+            <h1 className={styles.name}>{isTv ? (episodeName ?? `Episode ${episode}`) : title}</h1>
+          </div>
         </div>
-        <span className={styles.name}>
-          {title}
-          {isTv && ` · S${season} E${episode}`}
-        </span>
+        <div className={styles.tools}>
+          <div
+            ref={group}
+            className={styles.switch}
+            role="radiogroup"
+            aria-label="Player"
+            onKeyDown={(e) => {
+              if (!e.key.startsWith("Arrow")) return;
+              e.preventDefault();
+              switchTo(cyclePlayer(wanted.current, e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1));
+            }}
+          >
+            {PLAYER_IDS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                role="radio"
+                aria-checked={p === player}
+                tabIndex={p === player ? 0 : -1}
+                className={p === player ? styles.active : ""}
+                onClick={() => {
+                  setNote(null);
+                  switchTo(p);
+                }}
+              >
+                Player {ADAPTERS[p].label}
+              </button>
+            ))}
+          </div>
+          {next && (
+            <button type="button" className={styles.glass} onClick={goNext}>
+              Next episode
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+          <span className={styles.glass} role="img" aria-label={phone ? "Phone connected" : "No phone connected"}>
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={phone ? "var(--ok)" : "var(--muted)"} strokeWidth="2" strokeLinecap="round">
+              <rect x="7" y="2" width="10" height="20" rx="2" />
+              <path d="M11 18h2" />
+            </svg>
+          </span>
+        </div>
         {note && (
           <p className={styles.note} role="status">
             {note}

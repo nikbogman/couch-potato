@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build src/index.html --outdir dist --minify --public-path / --asset-naming [name].[ext]",
+    "build": "bun build ui/index.html --outdir dist --minify --public-path / --asset-naming [name].[ext]",
     "dev": "wrangler dev --ip 0.0.0.0",
     "deploy": "wrangler deploy",
     "test": "bun test",

@@ -12,8 +12,8 @@ export type PlaybackCommand =
   | { cmd: "setMuted"; muted: boolean }
   | { cmd: "getStatus" };
 
-/** What a phone can ask the TV: playback commands plus the three things the TV's player screen does itself. */
-export type RemoteCommand = PlaybackCommand | { cmd: "nextEpisode" } | { cmd: "switchPlayer" } | { cmd: "stop" };
+/** What a phone can ask the TV: playback commands plus what the TV's player screen does itself. `fullscreen` toggles. */
+export type RemoteCommand = PlaybackCommand | { cmd: "nextEpisode" } | { cmd: "switchPlayer" } | { cmd: "stop" } | { cmd: "fullscreen" };
 
 /** What the TV reports while the player is open. `null` (idle) is sent everywhere else. */
 export type NowPlaying = {
@@ -32,6 +32,8 @@ export type NowPlaying = {
   player: PlayerId;
   /** An aired next episode exists. */
   canNext: boolean;
+  /** The video fills the screen: our band is hidden. */
+  fullscreen: boolean;
 };
 
 const num = (v: unknown) => typeof v === "number" && Number.isFinite(v);
@@ -41,7 +43,7 @@ export const clamp01 = (v: number) => clamp(v, 0, 1);
 /** Validates untrusted JSON. */
 export function parseRemoteCommand(c: any): RemoteCommand | null {
   switch (c?.cmd) {
-    case "play": case "pause": case "togglePlay": case "getStatus": case "nextEpisode": case "switchPlayer": case "stop":
+    case "play": case "pause": case "togglePlay": case "getStatus": case "nextEpisode": case "switchPlayer": case "stop": case "fullscreen":
       return { cmd: c.cmd };
     case "seekTo": return num(c.time) && c.time >= 0 ? { cmd: "seekTo", time: c.time } : null;
     case "seekBy": return num(c.delta) ? { cmd: "seekBy", delta: c.delta } : null;
@@ -66,5 +68,6 @@ export function parseNowPlaying(s: any, parseTarget: (t: any) => Target | null):
   )
     return undefined;
   const { title, episode, art, position, duration, playing, muted, volume, player, canNext } = s;
-  return { target, title, episode, art, position, duration, playing, muted, volume: clamp01(volume), player, canNext };
+  // `fullscreen` is newer than the rest: a TV page from before it reads as not fullscreen.
+  return { target, title, episode, art, position, duration, playing, muted, volume: clamp01(volume), player, canNext, fullscreen: s.fullscreen === true };
 }

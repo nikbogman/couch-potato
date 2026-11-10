@@ -44,7 +44,7 @@ The look is already designed: the HTML in this repo (`index.html`, `tv-*.html`, 
 ```
 working-title/
   designs/            the current HTML/CSS/JS design files, moved here unchanged
-  src/                the React client (started from couch/src)
+  ui/                the React client (started from couch/src)
   shared/             from couch/shared (types, protocol, playback validation)
   server/, worker/    from couch; Hono backend, collection added
   PLAN.md, README.md
@@ -61,7 +61,7 @@ Each phase is one PR-sized ticket. Finish with `bun test` and `bun run typecheck
 - **Done when** the copied app runs locally and all of Couch's tests pass unchanged.
 
 ### 2. Design tokens and restyle
-- Put the tokens from `designs/styles.css` (`:root`: ground, surface, raised, ink, ink-soft, muted, amber, live, ring) into `src/styles.css`; Inter via Google Fonts.
+- Put the tokens from `designs/styles.css` (`:root`: ground, surface, raised, ink, ink-soft, muted, amber, live, ring) into `ui/styles.css`; Inter via Google Fonts.
 - Restyle Couch's components to the designs: `TitleHero`, `Card`, `Row`/`ScrollRow`, `Status`, `TvLayout`, `RemoteLayout`, `NowPlayingBar`, `PadHints`, `ControllerHelp`.
 - Focus is one style everywhere: white ring with a dark gap, 1.06 scale, `transform` only, off under `prefers-reduced-motion`.
 - **Done when** TV Home and a title page match `designs/tv-home.html` and `designs/tv-title.html` side by side.
@@ -69,14 +69,14 @@ Each phase is one PR-sized ticket. Finish with `bun test` and `bun run typecheck
 ### 3. Navigation
 - TV: top tabs Home, Explore, My lists (`TvLayout`). Search becomes part of Explore.
 - Phone: bottom tab bar Home, Lists, Remote, Explore (`RemoteLayout`), safe-area aware.
-- Keep spatial navigation (`src/navigation/spatial.ts`) and gamepad input working across the new tabs; add tests for tab focus order.
+- Keep spatial navigation (`ui/navigation/spatial.ts`) and gamepad input working across the new tabs; add tests for tab focus order.
 
 ### 4. Collection backend (Hono + D1)
 - Port `collection/` (schema, logic, routes, tests) and the bits of `movies/` it needs from Popcorn's old Hono server (`git -C ../popcorn show 4160257^:apps/server/src/...`). Skip `reels/`, `csv/` and Popcorn's `auth/`.
 - Drizzle with the `d1` driver; migrations under `drizzle/`, applied with `wrangler d1 migrations apply`.
 - Key rows by `(tmdb_id, media_type)` so series fit.
 - Mount the routes in Couch's backend behind its existing password cookie. If Couch's Worker isn't on Hono yet, move it onto Hono first (keep its tests green).
-- Client: `src/collection/` with react-query hooks against these routes.
+- Client: `ui/collection/` with react-query hooks against these routes.
 - **Done when** the ported collection tests pass against local D1 (`wrangler dev`/miniflare) and the hooks are covered against a mocked fetch.
 
 ### 5. Phone Lists (`designs/phone-lists.html`)
@@ -95,7 +95,7 @@ Each phase is one PR-sized ticket. Finish with `bun test` and `bun run typecheck
 
 ### 8. Player chrome (`designs/tv-playing.html`)
 - Restyle `Player.tsx`'s own layer only: header that hides after 4 s of no input and shows on any key, pad button, pointer move or pause; player switch as a segmented group; toast for commands from the phone.
-- **Don't touch** `src/player/adapters.ts`, the embed URL builders, the startup status check or the fallback logic; they were tuned against real players. Run the existing player tests.
+- **Don't touch** `ui/player/adapters.ts`, the embed URL builders, the startup status check or the fallback logic; they were tuned against real players. Run the existing player tests.
 
 ### 9. Phone remote (`designs/phone-remote.html`)
 - Restyle `NowPlaying` and `NowPlayingBar`: still, title, progress with times, back 10 / play-pause / forward 10, Switch player, Next episode.
