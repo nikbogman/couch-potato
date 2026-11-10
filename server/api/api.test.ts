@@ -96,14 +96,14 @@ test("movie details are mapped, and TMDB 404 / failure map to 404 / 502", async 
     if (url.includes("/movie/404")) return new Response("{}", { status: 404 });
     if (url.includes("/movie/500")) return new Response("{}", { status: 500 });
     return Response.json({
-      id: 603, title: "The Matrix", release_date: "1999-03-30", runtime: 136,
+      id: 603, title: "The Matrix", release_date: "1999-03-30", runtime: 136, vote_average: 8.217,
       genres: [{ id: 1, name: "Action" }, { id: 2, name: "Sci-Fi" }],
       overview: "A hacker.", backdrop_path: "/b.jpg", cast: ["ignored"],
     });
   });
   const res = await a(new Request("http://x/api/movie/603"));
   expect(await res.json()).toEqual({
-    id: 603, title: "The Matrix", year: "1999", runtime: 136,
+    id: 603, title: "The Matrix", year: "1999", runtime: 136, rating: "8.2",
     genres: ["Action", "Sci-Fi"], overview: "A hacker.", backdropPath: "/b.jpg",
   });
   expect(new URL(called).pathname).toBe("/3/movie/603");

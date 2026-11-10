@@ -1,25 +1,19 @@
-/* Movie: fills the screen below the header. Series (compact): shorter, so episodes show without scrolling. */
+/* TV title page (designs: TV · Title): fills the screen below Back, backdrop on the right 62%. */
 .hero {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: calc(100vh - var(--header-h));
-  padding: 0 var(--safe-x);
+  min-height: 100vh;
+  /* Runs up behind the transparent Back header, as on the design. */
+  margin-top: calc(-1 * var(--header-h));
+  padding: var(--header-h) var(--safe-x) 0;
   overflow: hidden;
-}
-
-.compact {
-  min-height: min(440px, 45vh);
-}
-
-.compact .info {
-  padding: var(--space-6) 0;
 }
 
 .backdrop {
   position: absolute;
   inset: 0 0 0 auto;
-  width: 70%;
+  width: 62.5%;
   height: 100%;
   object-fit: cover;
 }
@@ -27,85 +21,134 @@
 .scrim {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(0deg, var(--ink) 0%, transparent 30%),
-    linear-gradient(90deg, var(--ink) 30%, rgb(11 12 16 / 0.7) 55%, rgb(11 12 16 / 0.15) 100%);
+  background: linear-gradient(90deg, var(--ink) 0%, rgb(11 12 14 / 0.9) 40%, rgb(11 12 14 / 0.2) 75%);
 }
 
-/* Title, then meta tucked under it, then a clear gap before the overview and again before the actions. */
+/* Series: shorter, so the episode row starts on the first screen. */
+.series {
+  min-height: 0;
+  padding-top: calc(var(--header-h) + 80px);
+  padding-bottom: var(--space-7);
+}
+
+/* TV Home's hero (compact; designs: TV · Home): the backdrop is a rounded 820×460 panel on the right. */
+.compact {
+  min-height: 0;
+  margin-top: 0;
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-6);
+}
+
+.compact .backdrop {
+  inset: 30px 120px auto auto;
+  width: 820px;
+  height: 460px;
+  border-radius: 24px;
+}
+
+.compact .scrim {
+  background:
+    linear-gradient(0deg, var(--ink) 0%, transparent 40%),
+    linear-gradient(90deg, var(--ink) 0%, rgb(11 12 14 / 0.85) 34%, rgb(11 12 14 / 0) 62%);
+}
+
 .info {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 860px;
+}
+
+.compact .info {
+  gap: 22px;
   max-width: 760px;
-  padding: var(--space-7) 0;
 }
 
 .eyebrow {
-  margin-bottom: var(--space-4);
-  color: var(--accent);
+  color: var(--muted);
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
+.compact .eyebrow {
+  color: var(--accent);
+}
+
 .title {
-  font-size: var(--text-3xl);
+  font-size: 104px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .compact .title {
-  font-size: calc(var(--text-3xl) * 0.85);
+  font-size: 96px;
 }
 
-.meta {
-  margin-top: var(--space-3);
-  color: var(--muted);
-  font-size: var(--text-md);
+.meta,
+.metaItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--text-soft);
+  font-size: 22px;
 }
 
 .overview {
   display: -webkit-box;
-  max-width: var(--measure);
-  margin-top: var(--space-5);
+  max-width: 760px;
   overflow: hidden;
-  font-size: var(--text-md);
-  line-height: var(--leading-relaxed);
+  color: var(--text-soft);
+  font-size: 24px;
+  line-height: 1.5;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  line-clamp: 5;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
 }
 
 .compact .overview {
+  max-width: 680px;
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
 
-/* Wider than the text column, so Play and the three list toggles fit on one line. */
+/* Wider than the text column, so every action fits on one line. */
 .actions {
   display: flex;
   flex-wrap: wrap;
   width: max-content;
   max-width: calc(100vw - 2 * var(--safe-x));
   align-items: center;
-  gap: var(--space-4) var(--space-5);
-  margin-top: var(--space-6);
+  gap: 16px;
+  margin-top: 8px;
 }
 
+.compact .actions {
+  margin-top: 12px;
+}
+
+/* Primary: white fill, dark text, play icon (style tile). */
 .play {
-  display: inline-block;
-  padding: var(--space-4) var(--space-7);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  height: 72px;
+  padding: 0 40px;
   border: 0;
   border-radius: 16px;
   background: var(--text);
   color: var(--ink);
-  font: 700 var(--text-lg) var(--font-head);
+  font: 600 24px var(--font-body);
+  white-space: nowrap;
   cursor: pointer;
-  transition: transform 120ms;
+  transition: transform 180ms ease-out, background-color 180ms ease-out;
 }
 
 .play:hover {
-  transform: scale(1.03);
+  background: #fff;
 }
 
 .play:focus-visible {
@@ -117,20 +160,27 @@
   cursor: default;
 }
 
-/* Secondary actions (list toggles): translucent, filled with the list's colour (--c) when on. */
+/* Everything else: 14% white. `.square` is icon-only (the heart on the title page). */
 .toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
+  justify-content: center;
+  gap: 12px;
+  height: 72px;
+  padding: 0 32px;
   border: 0;
   border-radius: 16px;
   background: var(--veil);
   color: var(--text);
-  font: 600 var(--text-md) var(--font-body);
+  font: 600 24px var(--font-body);
   white-space: nowrap;
   cursor: pointer;
   transition: transform 180ms ease-out, background-color 180ms ease-out;
+}
+
+.square {
+  width: 72px;
+  padding: 0;
 }
 
 .toggle:hover {
@@ -141,8 +191,9 @@
   transform: scale(1.04);
 }
 
+/* On: white fill, dark text. Amber is never a button colour (style tile). */
 .toggle[aria-pressed="true"] {
-  background: var(--c, var(--text));
+  background: var(--text);
   color: var(--ink);
 }
 
@@ -153,14 +204,15 @@
 
 .aside {
   color: var(--muted);
-  font-size: var(--text-md);
+  font-size: 22px;
   font-variant-numeric: tabular-nums;
 }
 
-/* Phone: backdrop on top, text below, full-width action. */
+/* Phone: backdrop on top, text below, full-width actions (style tile: title 32, body 16, eyebrow 12). */
 :global(.remote) .hero {
   display: block;
   min-height: 0;
+  margin-top: 0;
   padding: 0;
 }
 
@@ -170,6 +222,7 @@
   display: block;
   width: 100%;
   height: 210px;
+  border-radius: 0;
 }
 
 :global(.remote) .scrim {
@@ -179,53 +232,64 @@
 }
 
 :global(.remote) .info {
+  gap: 12px;
   max-width: none;
-  margin-top: calc(-1 * var(--space-7));
+  margin-top: -32px;
   padding: 0 var(--safe-x) var(--space-5);
 }
 
-:global(.remote) .title,
-:global(.remote) .compact .title {
-  font-size: var(--text-3xl);
+:global(.remote) .eyebrow {
+  font-size: 12px;
+}
+
+:global(.remote) .title {
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+:global(.remote) .meta,
+:global(.remote) .metaItem {
+  gap: 8px;
+  font-size: 14px;
 }
 
 :global(.remote) .overview {
+  font-size: 16px;
   -webkit-line-clamp: 5;
   line-clamp: 5;
 }
 
 :global(.remote) .actions {
-  width: auto;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--space-3);
-}
-
-:global(.remote) .actions:has(.toggle) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: auto;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 :global(.remote) .actions > :not(.toggle) {
   grid-column: 1 / -1;
 }
 
-:global(.remote) .toggle {
-  flex-direction: column;
+:global(.remote) .play {
   justify-content: center;
-  gap: var(--space-1);
-  min-height: 64px;
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
+  height: 52px;
+  padding: 0 var(--space-5);
+  font-size: 16px;
 }
 
-:global(.remote) .play {
-  min-height: 52px;
-  padding: var(--space-3) var(--space-5);
-  text-align: center;
+:global(.remote) .toggle,
+:global(.remote) .square {
+  flex-direction: column;
+  gap: 4px;
+  width: auto;
+  height: 64px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 13px;
 }
 
 :global(.remote) .aside {
+  font-size: 14px;
   text-align: center;
 }

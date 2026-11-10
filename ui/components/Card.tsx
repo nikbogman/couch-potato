@@ -9,7 +9,7 @@ type Resume = { position: number; duration: number; backdropPath: string | null;
 /** "32 min left" for a started movie or episode, "Next episode" for a series' unstarted one; series get "S2 E4 · " in front. */
 function resumeLine(p: Resume): string {
   const left = p.duration > 0 ? timeLeft(p.position, p.duration) : "Next episode";
-  return p.season === undefined ? left : `S${p.season} E${p.episode} · ${left}`;
+  return p.season === undefined ? left : `S${p.season} · E${p.episode} · ${left}`;
 }
 
 /**
@@ -42,13 +42,14 @@ export function Card({
         <div className={`${styles.poster} ${progress ? styles.landscape : ""}`}>
           {image ? <img src={image} alt="" width={progress ? 780 : 342} height={progress ? 439 : 513} loading="lazy" /> : <span className={styles.fallback}>{r.title}</span>}
           {badge && <span className={styles.badge}>{r.mediaType === "movie" ? "Movie" : "Series"}</span>}
+          {progress && <span className={styles.over}>{r.title}</span>}
           {progress && progress.duration > 0 && (
             <div className={styles.track} aria-hidden="true">
               <div className={styles.fill} style={{ width: `${Math.min(100, (progress.position / progress.duration) * 100)}%` }} />
             </div>
           )}
         </div>
-        <div className={styles.title}>{r.title}</div>
+        {!progress && <div className={styles.title}>{r.title}</div>}
         {progress ? (
           <div className={styles.meta}>{resumeLine(progress)}</div>
         ) : (

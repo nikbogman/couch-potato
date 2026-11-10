@@ -27,6 +27,8 @@ export type MovieDetails = {
   title: string;
   year: string | null;
   runtime: number | null;
+  /** "8.4", or null with no votes. */
+  rating: string | null;
   genres: string[];
   overview: string;
   backdropPath: string | null;
@@ -83,6 +85,9 @@ export type SeriesDetails = {
   title: string;
   years: string | null;
   genres: string[];
+  rating: string | null;
+  /** The first network TMDB lists ("Apple TV+"). */
+  network: string | null;
   overview: string;
   backdropPath: string | null;
   seasons: { season: number; name: string; episodeCount: number }[];

@@ -6,17 +6,23 @@
   padding: var(--space-6) 0 var(--space-9);
 }
 
-/* Phone: search entry point, compact rows. */
-.search {
+/* Phone: the title row (style tile: phone title 32 bold), then compact rows. */
+.head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
-  min-height: 48px;
-  margin: 0 var(--safe-x);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--muted);
+  margin: 0 var(--safe-x) var(--space-4);
+  padding-top: var(--space-5);
+}
+
+.h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 :global(.remote) .page {
@@ -24,6 +30,4 @@
   padding: var(--space-4) 0 var(--space-5);
 }
 
-:global(.remote) .search {
-  margin-bottom: var(--space-4); /* the search field is its own group, apart from the first row */
-}
+

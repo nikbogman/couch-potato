@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: var(--space-5) var(--safe-x) 0;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--safe-x) 0;
 }
 
 .h1 {
@@ -75,52 +75,6 @@
 
 .counter[aria-selected="true"] .what {
   font-weight: 600;
-}
-
-/* Filter and order on one line, quiet until needed. */
-.tools {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.filter {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  align-items: center;
-  gap: 10px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--muted);
-}
-
-.filter:focus-within {
-  box-shadow: var(--ring);
-}
-
-.filter input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: none;
-  box-shadow: none;
-  background: transparent;
-  color: var(--text);
-  font: 400 16px var(--font-body); /* 16px: iOS doesn't zoom in */
-}
-
-.sort {
-  flex: none;
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font-size: 13px;
-  cursor: pointer;
 }
 
 .empty {
@@ -212,15 +166,4 @@
 .more {
   padding: var(--space-4) 0;
   text-align: center;
-}
-
-/* TV list rows: icon, name, and the count in the list's colour. */
-.heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.total {
-  font-weight: 700;
 }

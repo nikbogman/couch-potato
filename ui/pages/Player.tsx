@@ -9,12 +9,12 @@ import { type NowPlaying, type PlaybackCommand, type RemoteCommand } from "../..
 import { isDirection, playbackFor } from "../navigation/gamepad";
 import { usePad } from "../navigation/gamepadInput";
 import { pressArrow } from "../navigation/spatial";
-import { PadHints } from "../components/PadHints";
 import { watchPath } from "../../shared/protocol";
 import { tvBridge } from "../remote/tvBridge";
 import { ADAPTERS, createSilenceWatch, cyclePlayer, DEFAULT_PLAYER, FALLBACK_AFTER_MS, mmss, PLAYER_IDS, playerFromParam, resumePoint } from "../player/adapters";
 import { type PlayerId } from "../../shared/types";
 import { usePlayerProgress } from "../player/usePlayerProgress";
+import { setPreferredPlayer } from "../player/preferred";
 import { PageMessage } from "../components/Status";
 import styles from "./Player.module.css";
 
@@ -100,8 +100,8 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   // the phone has no click behind it), so we ask its real status once and start it if it is paused.
   const starting = useRef(false);
   // What the phone is shown. Read through a ref so the reporter (made once) always sees the latest title, player and episode.
-  const live = useRef({ target, title, art, canNext: !!next, player, full });
-  live.current = { target, title, art, canNext: !!next, player, full };
+  const live = useRef({ target, title, art, canNext: !!next, player, full, episodeName });
+  live.current = { target, title, art, canNext: !!next, player, full, episodeName };
   const reporter = useState(() =>
     createStateReporter(() => {
       const l = live.current;
@@ -114,6 +114,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
         player: l.player,
         canNext: l.canNext,
         fullscreen: l.full,
+        episodeName: l.episodeName?.slice(0, 200) ?? null,
       };
       tvBridge.push(state);
     }),
@@ -141,6 +142,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     const at = resumePoint(now(), loaded);
     setLoaded({ ...at, player: next });
     setParams(next === DEFAULT_PLAYER ? {} : { player: next }, { replace: true });
+    setPreferredPlayer(next); // the next title starts here too
     return at.startAt;
   };
   // A fresh load starts from our start time, not playing; tell the phone about it, and about a new title, player or next episode.
@@ -154,7 +156,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   }, [loaded]);
   useEffect(() => {
     if (loaded) reporter.push();
-  }, [loaded, title, art, next, here, full]);
+  }, [loaded, title, art, next, here, full, episodeName]);
   const fallBack = useEffectEvent(() => {
     const at = switchTo("playertwo");
     if (at !== null) setNote(`Player 1 didn't respond, switched to player 2 at ${mmss(at)}`);
@@ -343,17 +345,6 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
       ) : (
         <div className={styles.frame} />
       )}
-      <div className={styles.footer}>
-        <PadHints
-          hints={[
-            { glyph: "A", label: "Play/pause" },
-            { glyph: "◀ ▶", label: "10 s" },
-            { glyph: "LB RB", label: "30 s" },
-            ...(next ? [{ glyph: "Y", label: "Next episode" }] : []),
-            { glyph: "B", label: "Back" },
-          ]}
-        />
-      </div>
     </div>
   );
 }

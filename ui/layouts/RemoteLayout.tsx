@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
-import { APP_NAME, BrandMark } from "../components/Brand";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import type { Target } from "../../shared/types";
 import { NowPlayingBar } from "../components/NowPlayingBar";
 import type { NowPlaying, RemoteCommand } from "../../shared/playback";
@@ -83,26 +82,17 @@ export function RemoteLayout() {
   return (
     <RemoteContext value={remote}>
       <div className={`remote ${styles.shell}`}>
-        <header className={styles.header}>
-          {!home && (
-            // Opened straight on a subpage (no history entry): Back goes home instead of leaving the app.
+        {!home && (
+          // Subpages only: tab roots start with their own title (designs: Phone · Lists, Explore, Remote).
+          <header className={styles.header}>
+            {/* Opened straight on a subpage (no history entry): Back goes home instead of leaving the app. */}
             <button type="button" className={styles.back} aria-label="Back" onClick={() => (key === "default" ? navigate("/remote") : navigate(-1))}>
               <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 5l-7 7 7 7" />
               </svg>
             </button>
-          )}
-          <Link to="/remote" className={styles.wordmark} translate="no">
-            <BrandMark size={28} />
-            {APP_NAME}
-          </Link>
-          <span className={`${styles.chip} ${tv ? styles.live : ""}`} role="status" aria-label={tv ? "TV connected" : "No TV"}>
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="13" rx="2" />
-              <path d="M8 21h8M12 17v4" />
-            </svg>
-          </span>
-        </header>
+          </header>
+        )}
         <main>
           <Outlet />
         </main>

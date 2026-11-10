@@ -52,7 +52,7 @@ function Table({ title, rows }: { title: string; rows: Row[] }) {
   );
 }
 
-/** Header badge: a controller and a phone icon, green while connected. Opens the list of controls (so does the pad's Menu button). */
+/** Header pill: the phone icon, green while a phone remote is connected (designs: TV · Home). Opens the list of controls (so does the pad's Menu button). */
 export function ControllerHelp() {
   const pad = usePadConnected();
   const phone = usePhoneConnected();
@@ -77,14 +77,7 @@ export function ControllerHelp() {
         aria-haspopup="dialog"
         aria-label={`Controls. ${pad ? "Controller connected" : "No controller"}, ${phone ? "phone remote connected" : "no phone remote"}.`}
       >
-        <svg className={pad ? styles.on : ""} aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <title>{pad ? "Controller connected" : "No controller"}</title>
-          <path d="M6.5 7h11a4 4 0 0 1 3.9 4.9l-1.2 5.2a2.2 2.2 0 0 1-3.9.9L14.5 16h-5l-1.8 2a2.2 2.2 0 0 1-3.9-.9l-1.2-5.2A4 4 0 0 1 6.5 7z" />
-          <path d="M8 10v3M6.5 11.5h3" />
-          <circle cx="15.5" cy="11" r="0.6" fill="currentColor" />
-          <circle cx="17.5" cy="13" r="0.6" fill="currentColor" />
-        </svg>
-        <svg className={phone ? styles.on : ""} aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <svg className={phone ? styles.on : ""} aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <title>{phone ? "Phone remote connected" : "No phone remote"}</title>
           <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
           <path d="M11 18.5h2" />

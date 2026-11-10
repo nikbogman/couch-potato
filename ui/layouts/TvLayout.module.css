@@ -16,26 +16,52 @@
   box-shadow: 0 12px 24px rgb(0 0 0 / 0.6);
 }
 
+/* Brand left, tabs centred, Search and phone status right (designs: TV · Home). */
 .left,
 .right {
   display: flex;
+  flex: 1;
   align-items: center;
 }
 
-.left {
-  gap: var(--space-7);
+.right {
+  justify-content: flex-end;
+  gap: 20px;
 }
 
-.right {
-  gap: var(--space-6);
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--veil-soft);
+}
+
+/* Title pages: Back only (designs: TV · Title). */
+.back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 20px var(--font-body);
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--text);
 }
 
 .wordmark {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  font: 700 var(--text-xl) var(--font-head);
-  letter-spacing: -0.02em;
+  font: 700 26px var(--font-head);
+  letter-spacing: -0.01em;
 }
 
 .nav {

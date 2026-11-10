@@ -5,6 +5,7 @@ import { searchTitles } from "../lib/api";
 import { Card } from "../components/Card";
 import { LoadError, Status } from "../components/Status";
 import { TrendingRow } from "../components/TrendingRow";
+import { useRemote } from "../remote/RemoteContext";
 import styles from "./Search.module.css";
 
 const DEBOUNCE_MS = 300;
@@ -32,12 +33,17 @@ export function Search() {
     placeholderData: keepPreviousData,
   });
   const results = q ? data : undefined;
+  const remote = useRemote();
 
   return (
     <div className={styles.page}>
-      <label htmlFor="q" className={styles.label}>
-        Explore movies and series
-      </label>
+      {remote ? (
+        <h1 className={styles.h1}>Explore</h1>
+      ) : (
+        <label htmlFor="q" className={styles.label}>
+          Explore movies and series
+        </label>
+      )}
       <div className={styles.field}>
         <svg
           aria-hidden="true"
@@ -57,8 +63,9 @@ export function Search() {
           name="q"
           type="search"
           enterKeyHint="search"
-          placeholder="Dune, The Bear…"
-          autoFocus
+          placeholder={remote ? "Search movies and series" : "Dune, The Bear…"}
+          aria-label={remote ? "Search movies and series" : undefined}
+          autoFocus={!remote} // on the phone it would pop the keyboard up on every visit
           autoComplete="off"
           spellCheck={false}
           value={text}
@@ -68,8 +75,14 @@ export function Search() {
       </div>
       {!q && (
         <div className={styles.explore}>
-          <TrendingRow title="Trending movies" kind="movie" />
-          <TrendingRow title="Trending TV" kind="tv" />
+          {remote ? (
+            <TrendingRow title="Trending this week" kind="mixed" />
+          ) : (
+            <>
+              <TrendingRow title="Trending movies" kind="movie" />
+              <TrendingRow title="Trending TV" kind="tv" />
+            </>
+          )}
         </div>
       )}
       <SearchStatus q={q} count={results?.length} isError={isError} isFetching={isFetching} retry={() => refetch()} />

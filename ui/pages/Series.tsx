@@ -2,11 +2,12 @@ import { useEffect, useRef } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "react-router";
 import { backdropUrl, fetchSeason, fetchSeries, type EpisodeSummary, type SeriesDetails } from "../lib/api";
-import { PadHints } from "../components/PadHints";
 import { PLAY_ON_TV, NoTvNote, PlayButton } from "../components/PlayButton";
+import { PlayerChoice } from "../components/PlayerChoice";
+import { ScrollRow } from "../components/ScrollRow";
 import { ListToggles } from "../components/ListToggles";
 import { LoadError, PageMessage, Status } from "../components/Status";
-import { heroAction, TitleHero } from "../components/TitleHero";
+import { heroAction, PlayGlyph, TitleHero } from "../components/TitleHero";
 import { usePad } from "../navigation/gamepadInput";
 import { placeFocus } from "../navigation/spatial";
 import { formatRuntime, timeLeft } from "../lib/format";
@@ -28,36 +29,24 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
   const remote = useRemote();
   const asked = Number(params.get("season"));
   const season = s.seasons.some((x) => x.season === asked) ? asked : (next?.season ?? s.seasons[0]?.season);
-  const meta = [s.years, `${s.seasons.length} season${s.seasons.length === 1 ? "" : "s"}`, s.genres.slice(0, 2).join(", ")].filter(Boolean).join(" · ");
+  const meta = [s.years?.slice(0, 4), `${s.seasons.length} season${s.seasons.length === 1 ? "" : "s"}`, s.genres[0], s.rating && `★ ${s.rating}`];
   const resume = next?.progress;
   return (
     <div className={styles.page}>
-      <TitleHero title={s.title} meta={meta} overview={s.overview} backdropPath={s.backdropPath} compact>
+      <TitleHero eyebrow={["Series", s.network].filter(Boolean).join(" · ")} title={s.title} meta={meta} overview={s.overview} backdropPath={s.backdropPath} layout="series">
         {next && (
           <PlayButton target={{ mediaType: "tv", id: s.id, season: next.season, episode: next.episode }} remoteLabel={PLAY_ON_TV} className={heroAction.play}>
-            {resume ? "▶ Resume" : "▶ Play"}
+            <PlayGlyph />
+            {resume ? "Resume" : "Play"} S{next.season} · E{next.episode}
           </PlayButton>
         )}
         <NoTvNote className={heroAction.aside} />
         <ListToggles mediaType="tv" id={s.id} />
-        {next && (
-          <span className={heroAction.aside}>
-            S{next.season} E{next.episode}
-            {resume && ` · ${timeLeft(resume.position, resume.duration)}`}
-          </span>
-        )}
+        <PlayerChoice />
+        {resume && <span className={heroAction.aside}>{timeLeft(resume.position, resume.duration)}</span>}
       </TitleHero>
       {season !== undefined && (
         <Picker s={s} season={season} select={(n) => setParams({ season: String(n) }, { replace: true })} />
-      )}
-      {!remote && (
-        <PadHints
-          hints={[
-            { glyph: "A", label: "Play" },
-            { glyph: "B", label: "Back" },
-            { glyph: "LB RB", label: "Season" },
-          ]}
-        />
       )}
     </div>
   );
@@ -66,7 +55,7 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
 /** Season tabs and the episode list. On first load it focuses the next episode (or the season's first), so Enter plays it. */
 function Picker({ s, season, select }: { s: SeriesDetails; season: number; select: (n: number) => void }) {
   const tabs = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLUListElement>(null);
+  const list = useRef<HTMLElement>(null);
   const remote = useRemote();
   const placed = useRef(false);
   // The previous season stays on screen while the next one loads: no "Loading…" flash, and the focused row isn't torn out.
@@ -104,7 +93,9 @@ function Picker({ s, season, select }: { s: SeriesDetails; season: number; selec
   };
 
   return (
-    <section className={styles.picker} aria-label="Episodes">
+    <section ref={list} className={styles.picker} aria-label="Episodes">
+      <div className={styles.pickerHead}>
+      {!remote && <h2 className={styles.h2}>Episodes</h2>}
       <div ref={tabs} role="tablist" aria-label="Seasons" className={styles.tabs} onKeyDown={onKeyDown}>
         {s.seasons.map((x) => (
           <button
@@ -120,20 +111,29 @@ function Picker({ s, season, select }: { s: SeriesDetails; season: number; selec
           </button>
         ))}
       </div>
+      </div>
       {isError ? (
         <LoadError what="episodes" retry={() => refetch()} />
       ) : !episodes ? (
         <Status>Loading…</Status>
       ) : !episodes.length ? (
         <Status>No episodes have aired yet.</Status>
-      ) : (
-        <ul ref={list} className={styles.list}>
+      ) : remote ? (
+        <ul className={styles.list}>
           {episodes.map((e) => (
             <li key={e.episode}>
               <EpisodeRow id={s.id} season={season} e={e} />
             </li>
           ))}
         </ul>
+      ) : (
+        <ScrollRow className={styles.cards}>
+          {episodes.map((e) => (
+            <li key={e.episode} className={styles.cardItem}>
+              <EpisodeCard id={s.id} season={season} e={e} />
+            </li>
+          ))}
+        </ScrollRow>
       )}
     </section>
   );
@@ -171,6 +171,24 @@ function EpisodeRow({ id, season, e }: { id: number; season: number; e: EpisodeS
           ▶
         </span>
       )}
+    </PlayButton>
+  );
+}
+
+/** TV episode card (designs: TV · Title): still with "E4" and a progress edge (grey once watched), name, "57 min · Watched". */
+function EpisodeCard({ id, season, e }: { id: number; season: number; e: EpisodeSummary }) {
+  const p = e.progress;
+  const fill = p ? (p.finished ? 100 : Math.min(100, (p.position / p.duration) * 100)) : 0;
+  const meta = p?.finished ? [e.runtime && formatRuntime(e.runtime), "Watched"] : p ? [timeLeft(p.position, p.duration)] : [e.runtime && formatRuntime(e.runtime)];
+  return (
+    <PlayButton target={{ mediaType: "tv", id, season, episode: e.episode }} className={styles.card} data-episode={e.episode}>
+      <span className={styles.frame}>
+        {e.stillPath && <img src={backdropUrl(e.stillPath, "w300")} alt="" width={300} height={169} loading="lazy" />}
+        <span className={styles.ep}>E{e.episode}</span>
+        {fill > 0 && <span className={`${styles.edge} ${p?.finished ? styles.done : ""}`} style={{ width: `${fill}%` }} aria-hidden="true" />}
+      </span>
+      <span className={styles.cardTitle}>{e.name}</span>
+      <span className={styles.cardMeta}>{meta.filter(Boolean).join(" · ")}</span>
     </PlayButton>
   );
 }

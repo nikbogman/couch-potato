@@ -48,7 +48,7 @@ const saveMovie = (a: Api, id: number) => post(a, { mediaType: "movie", tmdbId: 
 test("series details: years, seasons without specials or empty ones, genres, and a first-time next episode", async () => {
   const a = makeApi();
   expect(await json(a, "/api/tv/10")).toEqual({
-    id: 10, title: "Show", years: "2020–2022", genres: ["Drama"], overview: "A show.", backdropPath: "/b.jpg",
+    id: 10, title: "Show", years: "2020–2022", genres: ["Drama"], rating: null, network: null, overview: "A show.", backdropPath: "/b.jpg",
     seasons: [{ season: 1, name: "Season 1", episodeCount: 3 }, { season: 2, name: "Season 2", episodeCount: 2 }],
     next: { season: 1, episode: 1, progress: null },
   });

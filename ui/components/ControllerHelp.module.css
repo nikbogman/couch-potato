@@ -1,11 +1,11 @@
 .chip {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
+  height: 56px;
+  padding: 0 18px;
   border: 0;
   border-radius: var(--radius-full);
-  background: transparent;
+  background: var(--veil-soft);
   color: var(--muted);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -13,7 +13,7 @@
 }
 
 .chip:hover {
-  background: var(--surface);
+  background: var(--veil);
 }
 
 /* Green: that device is connected. */

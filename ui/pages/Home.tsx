@@ -9,6 +9,8 @@ import { useRemote, useBase } from "../remote/RemoteContext";
 import { focusAndReveal } from "../navigation/spatial";
 import { ListRow } from "./Lists";
 import { UpNextHero } from "../components/UpNextHero";
+import { APP_NAME, BrandMark } from "../components/Brand";
+import { TvStatus } from "../components/TvStatus";
 import row from "../components/Row.module.css";
 import styles from "./Home.module.css";
 
@@ -17,13 +19,14 @@ export function Home() {
   return (
     <div className={styles.page}>
       {remote && (
-        <Link to="/remote/search" className={styles.search}>
-          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-4-4" />
-          </svg>
-          Search and explore
-        </Link>
+        // Phone screens start with their title (designs): here the app's name, with the TV status.
+        <div className={styles.head}>
+          <h1 className={styles.h1} translate="no">
+            <BrandMark size={32} />
+            {APP_NAME}
+          </h1>
+          <TvStatus />
+        </div>
       )}
       {!remote && <UpNextHero />}
       <ContinueRow />

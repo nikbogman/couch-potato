@@ -15,7 +15,7 @@ function sock() {
   return s;
 }
 const send = (room: ReturnType<typeof createRoom>, s: Sock, m: unknown) => room.message(s, JSON.stringify(m));
-const state = { target: { mediaType: "movie" as const, id: 1 }, title: "T", episode: null, art: null, position: 5, duration: 100, playing: false, muted: false, volume: 1, player: "playerone" as const, canNext: false, fullscreen: false };
+const state = { target: { mediaType: "movie" as const, id: 1 }, title: "T", episode: null, art: null, position: 5, duration: 100, playing: false, muted: false, volume: 1, player: "playerone" as const, canNext: false, fullscreen: false, episodeName: null };
 
 test("a phone's play reaches the TV and presence follows the TV", () => {
   const all: Sock[] = [];

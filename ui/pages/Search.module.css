@@ -67,31 +67,38 @@
   list-style: none;
 }
 
+/* Phone (designs: Phone · Explore): title, a 44px field, one trending shelf. */
 :global(.remote) .page {
-  gap: var(--space-3);
-  padding: var(--space-4) var(--safe-x) var(--space-5);
+  gap: 16px;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--safe-x) var(--space-5);
+}
+
+.h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 :global(.remote) .field {
-  height: 48px;
-  gap: var(--space-3);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
+  height: 44px;
+  gap: 10px;
+  padding: 0 14px;
+  border-radius: 12px;
 }
 
 :global(.remote) .field svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* 16px stops iOS zooming in on focus. */
 :global(.remote) .input {
-  font: 500 16px var(--font-body);
+  font: 400 16px var(--font-body);
 }
 
 :global(.remote) .explore {
-  gap: var(--space-2);
-  margin-top: var(--space-4);
+  gap: 12px;
+  margin-top: 4px;
 }
 
 :global(.remote) .grid {

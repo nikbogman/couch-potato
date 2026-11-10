@@ -21,6 +21,8 @@ export type NowPlaying = {
   title: string;
   /** "S1 E2" for episodes, null for movies. */
   episode: string | null;
+  /** The episode's own name ("Pilot"), when known. */
+  episodeName: string | null;
   /** TMDB backdrop path. */
   art: string | null;
   position: number;
@@ -69,5 +71,5 @@ export function parseNowPlaying(s: any, parseTarget: (t: any) => Target | null):
     return undefined;
   const { title, episode, art, position, duration, playing, muted, volume, player, canNext } = s;
   // `fullscreen` is newer than the rest: a TV page from before it reads as not fullscreen.
-  return { target, title, episode, art, position, duration, playing, muted, volume: clamp01(volume), player, canNext, fullscreen: s.fullscreen === true };
+  return { target, title, episode, art, position, duration, playing, muted, volume: clamp01(volume), player, canNext, fullscreen: s.fullscreen === true, episodeName: str(s.episodeName) ? s.episodeName : null };
 }

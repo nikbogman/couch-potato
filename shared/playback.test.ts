@@ -11,7 +11,7 @@ test("remote commands are validated and volume is clamped", () => {
     expect(parseRemoteCommand(bad)).toBeNull();
 });
 
-const np = { target: { mediaType: "movie", id: 1 }, title: "T", episode: null, art: null, position: 1, duration: 2, playing: true, muted: false, volume: 0.5, player: "playerone", canNext: false, fullscreen: false };
+const np = { target: { mediaType: "movie", id: 1 }, title: "T", episode: null, art: null, position: 1, duration: 2, playing: true, muted: false, volume: 0.5, player: "playerone", canNext: false, fullscreen: false, episodeName: null };
 
 test("now-playing state: null is idle, malformed is undefined", () => {
   expect(parseNowPlaying(null, parseTarget)).toBeNull();

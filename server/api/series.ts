@@ -1,6 +1,6 @@
 import type { Progress } from "../progress/store";
 import type { TmdbTv } from "../tmdb/types";
-import { tmdbError, type Ctx } from "./http";
+import { rating, tmdbError, type Ctx } from "./http";
 import { nextEpisode, type Episode, type SeasonEpisodes } from "./nextEpisode";
 
 /** Real seasons in order. Specials (season 0) and seasons TMDB lists with no episodes yet are left out everywhere. */
@@ -45,6 +45,8 @@ export async function series(ctx: Ctx, id: string) {
       title: t.name ?? "",
       years: years(t),
       genres: (t.genres ?? []).map((g) => g.name),
+      rating: rating(t.vote_average),
+      network: t.networks?.[0]?.name ?? null,
       overview: t.overview ?? "",
       backdropPath: t.backdrop_path ?? null,
       seasons: realSeasons(t).map((s) => ({ season: s.season_number, name: s.name ?? `Season ${s.season_number}`, episodeCount: s.episode_count ?? 0 })),

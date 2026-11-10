@@ -5,9 +5,9 @@ import { useList } from "../lib/collection";
 import { formatRuntime } from "../lib/format";
 import { ListToggles } from "./ListToggles";
 import { PlayButton } from "./PlayButton";
-import { heroAction, TitleHero } from "./TitleHero";
+import { heroAction, PlayGlyph, TitleHero } from "./TitleHero";
 
-/** TV Home's top (designs: TV · Home): the newest title in To watch, with Play, the list toggles and More info. Nothing while loading or when To watch is empty. */
+/** TV Home's top (designs: TV · Home): the newest title in To watch, with Play, Watched and More info. Nothing while loading or when To watch is empty. */
 export function UpNextHero() {
   const first = useList("to_watch").data?.pages[0]?.items[0];
   const isTv = first?.mediaType === "tv";
@@ -17,20 +17,22 @@ export function UpNextHero() {
   if (!first) return null;
   const m = movie.data;
   const s = series.data;
-  const d = isTv ? s : m;
-  if (!d) return null;
+  if (isTv ? !s : !m) return null;
+  const rating = (isTv ? s!.rating : m!.rating) ?? null;
   const meta = isTv
-    ? [s!.years, `${s!.seasons.length} season${s!.seasons.length === 1 ? "" : "s"}`, s!.genres.slice(0, 2).join(", ")]
-    : [m!.year, m!.runtime && formatRuntime(m!.runtime), m!.genres.slice(0, 2).join(", ")];
-  const target = isTv ? (s!.next ? { mediaType: "tv" as const, id: s!.id, ...s!.next } : null) : { mediaType: "movie" as const, id: m!.id };
+    ? [s!.years?.slice(0, 4), `${s!.seasons.length} season${s!.seasons.length === 1 ? "" : "s"}`, s!.genres[0], rating && `★ ${rating}`]
+    : [m!.year, m!.runtime ? formatRuntime(m!.runtime) : null, m!.genres[0], rating && `★ ${rating}`];
+  const target = isTv ? (s!.next ? { mediaType: "tv" as const, id: s!.id, season: s!.next.season, episode: s!.next.episode } : null) : { mediaType: "movie" as const, id: m!.id };
+  const d = (isTv ? s : m)!;
   return (
-    <TitleHero eyebrow="From your To watch" title={d.title} meta={meta.filter(Boolean).join(" · ")} overview={d.overview} backdropPath={d.backdropPath} compact>
+    <TitleHero eyebrow="From your To watch" title={d.title} meta={meta} overview={d.overview} backdropPath={d.backdropPath} layout="home">
       {target && (
         <PlayButton target={target} className={heroAction.play}>
-          ▶ Play
+          <PlayGlyph />
+          Play
         </PlayButton>
       )}
-      <ListToggles mediaType={first.mediaType} id={first.id} />
+      <ListToggles mediaType={first.mediaType} id={first.id} only={["watched"]} labelled />
       <Link to={`/${first.mediaType}/${first.id}`} className={heroAction.toggle}>
         More info
       </Link>

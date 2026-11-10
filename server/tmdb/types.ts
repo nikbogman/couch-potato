@@ -15,6 +15,7 @@ export type TmdbMovie = {
   title?: string;
   release_date?: string;
   runtime?: number | null;
+  vote_average?: number;
   genres?: { name: string }[];
   overview?: string;
   poster_path?: string | null;
@@ -27,6 +28,8 @@ export type TmdbTv = {
   first_air_date?: string;
   last_air_date?: string;
   status?: string;
+  vote_average?: number;
+  networks?: { name: string }[];
   genres?: { name: string }[];
   overview?: string;
   poster_path?: string | null;

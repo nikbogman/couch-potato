@@ -53,16 +53,41 @@
   aspect-ratio: 16 / 9;
 }
 
+/* Inset progress bar (designs: TV · Home). */
 .track {
   position: absolute;
-  inset: auto 0 0;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
   height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
   background: rgb(255 255 255 / 0.25);
 }
 
 .fill {
   height: 100%;
+  border-radius: 3px;
   background: var(--accent);
+}
+
+/* Continue watching: the title sits in the frame, over a shade, so the meta line under it is only the time left. */
+.over {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 48px 16px 32px;
+  background: linear-gradient(0deg, rgb(11 12 14 / 0.85), transparent);
+  color: rgb(255 255 255 / 0.95);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.landscape {
+  border-radius: 16px;
 }
 
 /* Reachable by keyboard (Delete) at all times; the button itself shows only on hover or focus. */
@@ -108,7 +133,7 @@
 /* Title reads first (white, semibold); meta recedes (muted, regular, smaller). */
 .title {
   overflow: hidden;
-  font-size: var(--text-md);
+  font-size: 20px;
   font-weight: 600;
   line-height: var(--leading-tight);
   white-space: nowrap;
@@ -118,7 +143,7 @@
 .meta {
   margin-top: calc(-1 * var(--space-2));
   color: var(--muted);
-  font-size: var(--text-sm);
+  font-size: 20px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -139,11 +164,34 @@
 }
 
 :global(.remote) .poster {
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
 }
 
 :global(.remote) .track {
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
   height: 4px;
+}
+
+:global(.remote) .over {
+  padding: 24px 10px 16px;
+  font-size: 16px;
+}
+
+:global(.remote) .title,
+:global(.remote) .meta {
+  font-size: 12px;
+}
+
+/* Phone poster cards: title only (designs: Phone · Explore); the time-left line stays on Continue watching. */
+:global(.remote) .card:not(:has(.landscape)) .meta {
+  display: none;
+}
+
+:global(.remote) .title {
+  color: var(--text-soft);
+  font-weight: 400;
 }
 
 :global(.remote) .remove {

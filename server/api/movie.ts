@@ -1,4 +1,4 @@
-import { tmdbError, type Ctx } from "./http";
+import { rating, tmdbError, type Ctx } from "./http";
 
 /** GET /api/movie/:id */
 export async function movie(ctx: Ctx, id: string) {
@@ -9,6 +9,7 @@ export async function movie(ctx: Ctx, id: string) {
       title: m.title ?? "",
       year: m.release_date?.slice(0, 4) || null,
       runtime: m.runtime || null,
+      rating: rating(m.vote_average),
       genres: (m.genres ?? []).map((g) => g.name),
       overview: m.overview ?? "",
       backdropPath: m.backdrop_path ?? null,

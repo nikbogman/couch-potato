@@ -1,8 +1,12 @@
 /* A titled horizontal row of cards (Continue watching, Trending). The row's own padding sets the gap under the heading. */
 .heading {
   margin: 0 var(--safe-x);
-  font-size: var(--text-xl);
-  font-weight: 700;
+  font-size: 28px; /* style tile: row heading TV 28 / phone 18, semibold */
+  font-weight: 600;
+}
+
+:global(.remote) .heading {
+  font-size: 18px;
 }
 
 .status {
@@ -16,11 +20,11 @@
 }
 
 .wide .item {
-  flex-basis: 360px;
+  flex-basis: 400px;
 }
 
 :global(.remote) .item {
-  flex-basis: 112px;
+  flex-basis: 104px;
 }
 
 :global(.remote) .wide .item {

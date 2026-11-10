@@ -4,8 +4,16 @@ import type { Target } from "../../shared/types";
 import { watchPath } from "../../shared/protocol";
 import { useRemote } from "../remote/RemoteContext";
 import { APP_NAME } from "./Brand";
+import { DEFAULT_PLAYER } from "../player/adapters";
+import { usePreferredPlayer } from "../player/preferred";
+import { PlayGlyph } from "./TitleHero";
 
-export const PLAY_ON_TV = "▶ Play on TV";
+export const PLAY_ON_TV = (
+  <>
+    <PlayGlyph size={20} />
+    Play on TV
+  </>
+);
 
 /**
  * Starts a title or episode. On the TV it's a link to the player; on the phone a button that sends the TV there
@@ -25,9 +33,10 @@ export function PlayButton({
   "data-episode"?: number;
 }) {
   const remote = useRemote();
+  const player = usePreferredPlayer(); // starts in the player chosen on the title page
   if (!remote)
     return (
-      <Link to={watchPath(target)} {...props}>
+      <Link to={watchPath(target) + (player === DEFAULT_PLAYER ? "" : `?player=${player}`)} {...props}>
         {children}
       </Link>
     );
