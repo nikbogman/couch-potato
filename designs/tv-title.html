@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0e">
+<title>Severance · Working Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="tv">
+  <div aria-hidden="true" style="position:absolute;inset:0;background:#1e2a30">
+    <div class="ph" style="position:absolute;right:0;top:0;width:1200px;height:1080px;background:#26363d">BACKDROP · TMDB original</div>
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,#0b0c0e 0%,rgba(11,12,14,.9) 40%,rgba(11,12,14,.2) 75%)"></div>
+  </div>
+
+  <a href="tv-home.html" class="muted" style="position:absolute;left:96px;top:96px;display:flex;align-items:center;gap:12px;font-size:20px;padding:8px 12px;border-radius:12px">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back
+  </a>
+
+  <section class="hero" style="top:200px;width:860px" aria-labelledby="t">
+    <span class="eyebrow" style="color:var(--muted)">Series</span>
+    <h1 id="t" style="font-size:104px">Severance</h1>
+    <div class="meta"><span>2022</span><span aria-hidden="true">·</span><span>2 seasons</span><span aria-hidden="true">·</span><span>Thriller</span><span aria-hidden="true">·</span><span>★ 8.7</span></div>
+    <p style="max-width:760px">Office workers at Lumon have their work and personal memories surgically split. One of them starts to ask what the job really is.</p>
+    <div class="actions" style="margin-top:8px">
+      <a class="btn primary" href="tv-playing.html" autofocus><svg width="24" height="24" viewBox="0 0 24 24" fill="#0b0c0e" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>Resume S2 · E4</a>
+      <button class="btn square" aria-label="Mark as favourite"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+      <button class="btn" style="font-size:22px">Player 1</button>
+    </div>
+  </section>
+
+  <section class="row" style="top:700px" aria-labelledby="eps">
+    <div style="display:flex;gap:8px;align-items:center" data-toggle>
+      <h2 id="eps" style="margin-right:24px">Episodes</h2>
+      <button class="chip" aria-pressed="false">Season 1</button>
+      <button class="chip" aria-pressed="true">Season 2</button>
+    </div>
+    <div class="cards">
+      <a class="card ep" href="tv-playing.html"><div class="frame">E1<i class="edge done" style="width:100%"></i></div><b>Hello, Ms. Cobel</b><span class="muted">57 min · Watched</span></a>
+      <a class="card ep" href="tv-playing.html"><div class="frame">E2<i class="edge done" style="width:100%"></i></div><b>Goodbye, Mrs. Selvig</b><span class="muted">49 min · Watched</span></a>
+      <a class="card ep" href="tv-playing.html"><div class="frame">E3<i class="edge done" style="width:100%"></i></div><b>Who Is Alive?</b><span class="muted">52 min · Watched</span></a>
+      <a class="card ep" href="tv-playing.html"><div class="frame">E4<i class="edge" style="width:42%"></i></div><b>Woe’s Hollow</b><span class="muted">31 min left</span></a>
+      <a class="card ep" href="tv-playing.html"><div class="frame">E5</div><b>Trojan’s Horse</b><span class="muted">53 min</span></a>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

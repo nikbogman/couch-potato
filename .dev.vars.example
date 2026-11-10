@@ -1,0 +1,5 @@
+# Local dev secrets for `wrangler dev`. Copy to .dev.vars (gitignored). Production uses `wrangler secret put`.
+# TMDB v3 API key: https://www.themoviedb.org/settings/api
+TMDB_API_KEY=
+# The one password for the login page
+COUCH_PASSWORD=

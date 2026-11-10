@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Playing · Working Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>html, body { background: #000; }</style>
+</head>
+<body>
+<main class="tv">
+  <!-- The real app puts the embed player's <iframe class="embed"> here: its video, controls and subtitles are not ours. -->
+  <div class="embed embed-ph ph">EMBED PLAYER IFRAME<span style="font-size:18px">Its own video, controls and subtitles</span></div>
+
+  <header class="player-head">
+    <div style="display:flex;align-items:center;gap:24px">
+      <a class="round" href="tv-title.html" aria-label="Back to title" autofocus><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0b0c0e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:20px;color:var(--ink-soft)">Severance · S2 · E4</span>
+        <h1>Woe’s Hollow</h1>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="seg" role="group" aria-label="Player" data-toggle>
+        <button aria-pressed="false">Player 1</button>
+        <button aria-pressed="true">Player 2</button>
+        <button aria-pressed="false">Player 3</button>
+      </div>
+      <button class="glass">Next episode<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      <span class="glass" role="img" aria-label="Phone connected"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7bd88f" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+    </div>
+  </header>
+
+  <div class="toast" aria-live="polite">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+    Paused from phone
+  </div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

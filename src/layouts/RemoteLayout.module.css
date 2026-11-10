@@ -1,0 +1,83 @@
+.shell {
+  padding-bottom: 104px; /* room for the Now playing bar */
+}
+
+/* Pinned and translucent, so the wordmark, Back and TV status stay in reach while content scrolls under it. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: env(safe-area-inset-top) var(--safe-x) 0;
+  background: rgb(11 12 16 / 0.82); /* --ink, translucent */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: calc(-1 * var(--space-3)); /* the chevron, not its touch target, lines up with the content edge */
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.back:active {
+  background: var(--surface);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-right: auto;
+  font: 700 var(--text-xl) var(--font-head);
+  letter-spacing: -0.5px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Green: a TV is connected, the same signal as the TV header's device icons. */
+.live {
+  color: var(--text);
+}
+
+.live svg {
+  color: var(--ok);
+}
+
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: 100px;
+  z-index: 6;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+  font-weight: 600;
+}

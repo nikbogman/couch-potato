@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wt",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  // Secrets (not here): TMDB_API_KEY, COUCH_PASSWORD. Locally they come from .dev.vars.
+  "build": { "command": "bun run build", "watch_dir": "src" },
+  "assets": {
+    "directory": "dist",
+    "binding": "ASSETS",
+    // The Worker checks the password before serving anything, the app shell and bundles included.
+    "run_worker_first": true,
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [{ "binding": "DB", "database_name": "wt", "database_id": "a0aadc58-c6ad-40d2-a815-c0b34f055d37", "migrations_dir": "migrations" }],
+  "durable_objects": { "bindings": [{ "name": "RELAY", "class_name": "Relay" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Relay"] }]
+}

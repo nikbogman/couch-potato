@@ -1,0 +1,226 @@
+.page {
+  padding-bottom: var(--space-9);
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--safe-x);
+}
+
+/* Sticky under the app header, so the season stays in view while the list scrolls under it. */
+.tabs {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 1;
+  display: flex;
+  gap: var(--space-3);
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-4) var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--ink);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--text-md);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Hover only where it's real: a tap leaves touch screens "hovering", which would turn the selected tab's text white on white. */
+@media (hover: hover) {
+  .tab:not(.selected):hover {
+    color: var(--text);
+  }
+}
+
+.tab:focus-visible {
+  transform: scale(1.08);
+}
+
+.selected {
+  background: var(--text);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Padding leaves room for the focus ring. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-2);
+  list-style: none;
+}
+
+/* A link on the TV, a button on the phone. */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  scroll-margin: 120px 0 200px; /* clear of the sticky tabs above; the next episode peeks below */
+  transition: transform 140ms ease-out, background-color 140ms;
+}
+
+.row:hover {
+  background: var(--surface-2);
+}
+
+.row:focus-visible {
+  background: var(--surface-3);
+  transform: scale(1.02);
+}
+
+.row:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.still {
+  position: relative;
+  flex: none;
+  width: 288px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.still img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.track {
+  position: absolute;
+  inset: auto 0 0;
+  height: 6px;
+  background: rgb(255 255 255 / 0.25);
+}
+
+.fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.name {
+  overflow: hidden;
+  font: 600 var(--text-lg) var(--font-head);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.runtime {
+  flex: none;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.blurb {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.check,
+.cast {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+
+/* Phone: compact rows and a smaller still. */
+:global(.remote) .tabs {
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+}
+
+:global(.remote) .tab {
+  padding: var(--space-2) var(--space-4);
+}
+
+:global(.remote) .list {
+  gap: var(--space-2);
+}
+
+:global(.remote) .row {
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  scroll-margin: 64px 0 24px;
+}
+
+:global(.remote) .still {
+  width: 112px;
+}
+
+:global(.remote) .track {
+  height: 4px;
+}
+
+:global(.remote) .text {
+  gap: var(--space-1);
+}
+
+:global(.remote) .head {
+  gap: var(--space-2);
+}
+
+:global(.remote) .name {
+  font-size: var(--text-md);
+}
+
+:global(.remote) .check,
+:global(.remote) .cast {
+  width: 32px;
+  height: 32px;
+}

@@ -1,0 +1,29 @@
+/* Rows sit a clear step apart. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) 0 var(--space-9);
+}
+
+/* Phone: search entry point, compact rows. */
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  margin: 0 var(--safe-x);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+:global(.remote) .page {
+  gap: var(--space-2);
+  padding: var(--space-4) 0 var(--space-5);
+}
+
+:global(.remote) .search {
+  margin-bottom: var(--space-4); /* the search field is its own group, apart from the first row */
+}

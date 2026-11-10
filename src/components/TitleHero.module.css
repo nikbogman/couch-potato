@@ -1,0 +1,165 @@
+/* Movie: fills the screen below the header. Series (compact): shorter, so episodes show without scrolling. */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - var(--header-h));
+  padding: 0 var(--safe-x);
+  overflow: hidden;
+}
+
+.compact {
+  min-height: min(440px, 45vh);
+}
+
+.compact .info {
+  padding: var(--space-6) 0;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 70%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, var(--ink) 0%, transparent 30%),
+    linear-gradient(90deg, var(--ink) 30%, rgb(11 12 16 / 0.7) 55%, rgb(11 12 16 / 0.15) 100%);
+}
+
+/* Title, then meta tucked under it, then a clear gap before the overview and again before the actions. */
+.info {
+  position: relative;
+  max-width: 760px;
+  padding: var(--space-7) 0;
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.compact .title {
+  font-size: calc(var(--text-3xl) * 0.85);
+}
+
+.meta {
+  margin-top: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-md);
+}
+
+.overview {
+  display: -webkit-box;
+  max-width: var(--measure);
+  margin-top: var(--space-5);
+  overflow: hidden;
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+
+.compact .overview {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.play {
+  display: inline-block;
+  padding: var(--space-4) var(--space-7);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--text);
+  color: var(--ink);
+  font: 700 var(--text-lg) var(--font-head);
+  cursor: pointer;
+  transition: transform 120ms;
+}
+
+.play:hover {
+  transform: scale(1.03);
+}
+
+.play:focus-visible {
+  transform: scale(1.05);
+}
+
+.play:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.aside {
+  color: var(--muted);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phone: backdrop on top, text below, full-width action. */
+:global(.remote) .hero {
+  display: block;
+  min-height: 0;
+  padding: 0;
+}
+
+:global(.remote) .backdrop {
+  position: relative;
+  inset: auto;
+  display: block;
+  width: 100%;
+  height: 210px;
+}
+
+:global(.remote) .scrim {
+  inset: 0 0 auto;
+  height: 210px;
+  background: linear-gradient(0deg, var(--ink) 0%, transparent 60%);
+}
+
+:global(.remote) .info {
+  max-width: none;
+  margin-top: calc(-1 * var(--space-7));
+  padding: 0 var(--safe-x) var(--space-5);
+}
+
+:global(.remote) .title,
+:global(.remote) .compact .title {
+  font-size: var(--text-3xl);
+}
+
+:global(.remote) .overview {
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+
+:global(.remote) .actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+:global(.remote) .play {
+  min-height: 52px;
+  padding: var(--space-3) var(--space-5);
+  text-align: center;
+}
+
+:global(.remote) .aside {
+  text-align: center;
+}

@@ -1,0 +1,109 @@
+.row {
+  position: relative;
+}
+
+/* Overflow-x also clips vertically, so the padding must cover the focused card's lift, ring and halo (about 30px) above and below. */
+.track {
+  display: flex;
+  gap: var(--space-6);
+  margin: 0;
+  padding: var(--space-6) var(--safe-x) var(--space-7);
+  overflow-x: auto;
+  overscroll-behavior-x: contain; /* a trackpad swipe at the end of a row must not navigate Back */
+  list-style: none;
+  scrollbar-width: none; /* the native bar clutters the gap between rows; the chevrons replace it */
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade at an end that has more behind it. Narrower than the safe margin, so a focused card's ring (which reaches into it) is never veiled. */
+.row::before,
+.row::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 72px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 280ms;
+}
+
+.row::before {
+  left: 0;
+  background: linear-gradient(to right, var(--ink) 0%, rgb(11 12 16 / 0.88) 30%, rgb(11 12 16 / 0.5) 60%, transparent 100%);
+}
+
+.row::after {
+  right: 0;
+  background: linear-gradient(to left, var(--ink) 0%, rgb(11 12 16 / 0.88) 30%, rgb(11 12 16 / 0.5) 60%, transparent 100%);
+}
+
+.row[data-start="false"]::before,
+.row[data-end="false"]::after {
+  opacity: 1;
+}
+
+/* Mouse only: touch scrolls by swipe, the pad and keyboard by focus. */
+.arrow {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    opacity: 0;
+    filter: drop-shadow(0 1px 6px rgb(0 0 0 / 0.6));
+    transition: opacity 200ms;
+  }
+
+  .prev {
+    left: 0;
+  }
+
+  .next {
+    right: 0;
+  }
+
+  .arrow svg {
+    transition: transform 200ms ease-out;
+  }
+
+  .arrow:hover svg {
+    transform: scale(1.2);
+  }
+
+  .row:hover .arrow:not(:disabled) {
+    opacity: 1;
+  }
+
+  .arrow:disabled {
+    visibility: hidden;
+  }
+}
+
+:global(.remote) .track {
+  gap: var(--space-3);
+  padding: var(--space-2) var(--safe-x) var(--space-4);
+}
+
+:global(.remote) .arrow,
+:global(.remote) .row::before,
+:global(.remote) .row::after {
+  display: none;
+}

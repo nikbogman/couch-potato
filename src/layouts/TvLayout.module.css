@@ -1,0 +1,75 @@
+/* Pinned. Transparent over a title page's backdrop at the top; solid once scrolled, so cards slide under it, not through it. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 var(--safe-x);
+  transition: background-color 200ms, box-shadow 200ms;
+}
+
+.scrolled {
+  background: var(--ink);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.6);
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.left {
+  gap: var(--space-7);
+}
+
+.right {
+  gap: var(--space-6);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: 700 var(--text-xl) var(--font-head);
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pill {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  color: var(--muted);
+  font-weight: 500;
+  transition: color 140ms, background-color 140ms;
+}
+
+.pill:hover {
+  color: var(--text);
+}
+
+.pill:focus-visible {
+  transform: scale(1.08);
+}
+
+.active {
+  background: var(--text);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.active:hover {
+  color: var(--ink);
+}
+
+.clock {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

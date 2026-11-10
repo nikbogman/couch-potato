@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0e">
+<title>Style · Working Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="doc">
+  <h1>Colors, type, focus</h1>
+  <div class="tile">
+    <section>
+      <h2>COLOR</h2>
+      <div class="swatch"><i style="background:#0b0c0e"></i><div>Ground<small>#0B0C0E · page background</small></div></div>
+      <div class="swatch"><i style="background:#16181c"></i><div>Surface<small>#16181C · cards, inputs</small></div></div>
+      <div class="swatch"><i style="background:#1f2227"></i><div>Raised<small>#1F2227 · chips, idle buttons</small></div></div>
+      <div class="swatch"><i style="background:#f4f4f5"></i><div>Ink<small>#F4F4F5 · text, primary button, focus</small></div></div>
+      <div class="swatch"><i style="background:#c9cbd0"></i><div>Ink soft<small>#C9CBD0 · body copy</small></div></div>
+      <div class="swatch"><i style="background:#9a9da4"></i><div>Muted<small>#9A9DA4 · meta, labels</small></div></div>
+      <div class="swatch"><i style="background:#f5b544"></i><div>Amber<small>#F5B544 · progress, eyebrows</small></div></div>
+      <div class="swatch"><i style="background:#7bd88f"></i><div>Live<small>#7BD88F · connected status</small></div></div>
+    </section>
+    <section>
+      <h2>TYPE · INTER</h2>
+      <p style="font-size:64px;font-weight:700;letter-spacing:-.03em;line-height:1">Title</p>
+      <p class="muted" style="font-size:13px;margin:4px 0 20px">TV 96 / Phone 32 · Bold · −3%</p>
+      <p style="font-size:28px;font-weight:600">Row heading</p>
+      <p class="muted" style="font-size:13px;margin:4px 0 20px">TV 28 / Phone 18 · Semibold</p>
+      <p style="font-size:22px;line-height:1.5;color:var(--ink-soft)">Body copy stays short and calm on a dark ground.</p>
+      <p class="muted" style="font-size:13px;margin:4px 0 20px">TV 24 / Phone 16 · Regular · 1.5</p>
+      <p class="eyebrow" style="font-size:16px">Eyebrow</p>
+      <p class="muted" style="font-size:13px;margin-top:4px">TV 18 / Phone 12 · Caps +14%</p>
+    </section>
+    <section>
+      <h2>FOCUS · SHAPE</h2>
+      <div class="focus-demo" aria-hidden="true"><div></div><div></div></div>
+      <ul class="rules">
+        <li>Focus: white ring with a dark gap, 1.06 scale, lifted shadow. One style for remote, pad and keyboard.</li>
+        <li>Amber marks progress and status, never buttons.</li>
+        <li>Primary action: white fill, dark text. Everything else: 14% white.</li>
+        <li>Radius 12–16 for cards and buttons, pills for tabs and chips.</li>
+        <li>8 px grid; TV safe margin 96 px each side.</li>
+        <li>Motion 150–200 ms ease-out on transform only; off under reduced motion.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

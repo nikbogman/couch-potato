@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0e">
+<title>My lists · Working Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="phone">
+  <div class="p-head">
+    <h1>My lists</h1>
+    <a class="p-icon" href="phone-explore.html" aria-label="Search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
+  </div>
+
+  <div class="segmented" role="tablist" aria-label="List">
+    <button role="tab" aria-selected="true" aria-controls="to-watch">To watch</button>
+    <button role="tab" aria-selected="false" aria-controls="watched">Watched</button>
+    <button role="tab" aria-selected="false" aria-controls="favourites">Favourites</button>
+  </div>
+
+  <section id="to-watch" role="tabpanel" aria-label="To watch">
+    <div class="count"><span>23 movies</span><span>Recently added</span></div>
+    <ul class="list">
+      <li><div class="poster" style="background:#2e2622"></div><div class="grow"><strong>Prisoners</strong><span>2013 · 2h 33m</span></div><button class="p-icon" aria-label="Play Prisoners on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#2a2320"></div><div class="grow"><strong>Fight Club</strong><span>1999 · 2h 19m</span></div><button class="p-icon" aria-label="Play Fight Club on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#1e2630"></div><div class="grow"><strong>Heat</strong><span>1995 · 2h 50m</span></div><button class="p-icon" aria-label="Play Heat on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#262a22"></div><div class="grow"><strong>Zodiac</strong><span>2007 · 2h 37m</span></div><button class="p-icon" aria-label="Play Zodiac on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#2b2622"></div><div class="grow"><strong>Parasite</strong><span>2019 · 2h 12m</span></div><button class="p-icon" aria-label="Play Parasite on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#2c2620"></div><div class="grow"><strong>Sicario</strong><span>2015 · 2h 1m</span></div><button class="p-icon" aria-label="Play Sicario on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+      <li><div class="poster" style="background:#262624"></div><div class="grow"><strong>Memento</strong><span>2000 · 1h 53m</span></div><button class="p-icon" aria-label="Play Memento on TV"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f4f4f5" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg></button></li>
+    </ul>
+  </section>
+
+  <section id="watched" role="tabpanel" aria-label="Watched" hidden>
+    <div class="count"><span>118 movies</span><span>Last watched</span></div>
+    <ul class="list">
+      <li><div class="poster" style="background:#202a2e"></div><div class="grow"><strong>Arrival</strong><span>Watched 8 Nov 2026</span></div></li>
+      <li><div class="poster" style="background:#2e2228"></div><div class="grow"><strong>Drive</strong><span>Watched 2 Nov 2026</span></div></li>
+      <li><div class="poster" style="background:#22262c"></div><div class="grow"><strong>Oldboy</strong><span>Watched 27 Oct 2026</span></div></li>
+    </ul>
+  </section>
+
+  <section id="favourites" role="tabpanel" aria-label="Favourites" hidden>
+    <div class="count"><span>9 movies</span><span>Recently added</span></div>
+    <ul class="list">
+      <li><div class="poster" style="background:#202a2e"></div><div class="grow"><strong>Arrival</strong><span>2016 · 1h 56m</span></div></li>
+      <li><div class="poster" style="background:#1e2630"></div><div class="grow"><strong>Heat</strong><span>1995 · 2h 50m</span></div></li>
+    </ul>
+  </section>
+</main>
+
+<footer class="tabbar">
+  <nav aria-label="Main">
+    <a href="#"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"/></svg>Home</a>
+    <a href="phone-lists.html" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Lists</a>
+    <a href="phone-remote.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="9" r="2"/></svg>Remote</a>
+    <a href="phone-explore.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M15 9l-2 4-4 2 2-4z"/></svg>Explore</a>
+  </nav>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

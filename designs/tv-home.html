@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0e">
+<title>Home · Working Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="tv">
+  <div class="tv-backdrop" aria-hidden="true">
+    <div class="art ph">BACKDROP · TMDB 1280w</div>
+    <div class="scrim-left"></div>
+    <div class="scrim-bottom"></div>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0b0c0e" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg></span>
+      <span translate="no">Working&nbsp;Title</span>
+    </a>
+    <nav class="tabs" aria-label="Main">
+      <a href="tv-home.html" aria-current="page">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">My lists</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" aria-label="Search"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+      <span class="status" role="img" aria-label="Phone connected"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7bd88f" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <span class="eyebrow">From your To watch</span>
+    <h1 id="hero-title">Fight Club</h1>
+    <div class="meta"><span>1999</span><span aria-hidden="true">·</span><span>2h 19m</span><span aria-hidden="true">·</span><span>Drama</span><span aria-hidden="true">·</span><span>★ 8.4</span></div>
+    <p>An insomniac office worker and a soap maker start an underground fight club that grows into something much bigger.</p>
+    <div class="actions">
+      <a class="btn primary" href="tv-playing.html" autofocus><svg width="24" height="24" viewBox="0 0 24 24" fill="#0b0c0e" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>Play</a>
+      <button class="btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Watched</button>
+      <a class="btn" href="tv-title.html">More info</a>
+    </div>
+  </section>
+
+  <section class="row" style="top: 700px" aria-labelledby="cw">
+    <h2 id="cw">Continue watching</h2>
+    <div class="cards">
+      <a class="card wide" href="tv-title.html"><div class="frame" style="background:#1f2b33"><strong>Severance</strong><div class="bar"><i style="width:42%"></i></div></div><span class="muted">S2 · E4 · 31 min left</span></a>
+      <a class="card wide" href="tv-playing.html"><div class="frame" style="background:#3a2c1e"><strong>Dune</strong><div class="bar"><i style="width:61%"></i></div></div><span class="muted">Part Two · 1h 02m left</span></a>
+      <a class="card wide" href="tv-playing.html"><div class="frame" style="background:#2b2420"><strong>The Bear</strong><div class="bar"><i style="width:23%"></i></div></div><span class="muted">S3 · E1 · 18 min left</span></a>
+      <a class="card wide" href="tv-playing.html"><div class="frame" style="background:#202a2e"><strong>Arrival</strong><div class="bar"><i style="width:58%"></i></div></div><span class="muted">48 min left</span></a>
+      <a class="card wide" href="tv-playing.html"><div class="frame" style="background:#2e2222"><strong>Shogun</strong><div class="bar"><i style="width:12%"></i></div></div><span class="muted">S1 · E7 · 40 min left</span></a>
+    </div>
+  </section>
+
+  <section class="row" style="top: 1000px" aria-labelledby="tw">
+    <h2 id="tw">To watch · 23</h2>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

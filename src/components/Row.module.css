@@ -1,0 +1,28 @@
+/* A titled horizontal row of cards (Continue watching, Trending). The row's own padding sets the gap under the heading. */
+.heading {
+  margin: 0 var(--safe-x);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.status {
+  margin: var(--space-4) var(--safe-x) 0;
+}
+
+/* min-width: 0 stops a long nowrap title from widening the item past its basis (the taller-poster bug). */
+.item {
+  flex: 0 0 200px;
+  min-width: 0;
+}
+
+.wide .item {
+  flex-basis: 360px;
+}
+
+:global(.remote) .item {
+  flex-basis: 112px;
+}
+
+:global(.remote) .wide .item {
+  flex-basis: 220px;
+}

@@ -1,0 +1,26 @@
+.status {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.retry {
+  min-height: 44px;
+  margin-left: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retry:hover {
+  background: var(--surface-3);
+}
+
+.page {
+  padding: var(--space-8) var(--safe-x);
+  color: var(--muted);
+  font-size: var(--text-lg);
+}
