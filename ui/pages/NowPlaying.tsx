@@ -92,16 +92,28 @@ export function NowPlaying() {
 
       <div className={styles.actions}>
         <button type="button" className={styles.action} onClick={() => command({ cmd: "switchPlayer" })}>
+          <svg {...icon} width="18" height="18">
+            <path d="M4 7h13l-3-3M20 17H7l3 3" />
+          </svg>
           <span className="sr-only">Switch player, now Player {ADAPTERS[np.player].label}. </span>
           <span aria-hidden="true">Switch player · {ADAPTERS[np.player].label}</span>
         </button>
         <button type="button" className={styles.action} disabled={!np.canNext} onClick={() => command({ cmd: "nextEpisode" })}>
+          <svg {...icon} width="18" height="18">
+            <path d="M5 5l9 7-9 7zM18 5v14" />
+          </svg>
           Next episode
         </button>
         <button type="button" className={styles.action} aria-pressed={np.fullscreen} onClick={() => command({ cmd: "fullscreen" })}>
+          <svg {...icon} width="18" height="18">
+            <path d={np.fullscreen ? "M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" : "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"} />
+          </svg>
           {np.fullscreen ? "Exit full screen" : "Full screen"}
         </button>
         <button type="button" className={styles.action} onClick={() => command({ cmd: "stop" })}>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2" />
+          </svg>
           Stop
         </button>
       </div>

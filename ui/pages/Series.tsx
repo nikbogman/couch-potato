@@ -3,7 +3,6 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "react-router";
 import { backdropUrl, fetchSeason, fetchSeries, type EpisodeSummary, type SeriesDetails } from "../lib/api";
 import { PLAY_ON_TV, NoTvNote, PlayButton } from "../components/PlayButton";
-import { PlayerChoice } from "../components/PlayerChoice";
 import { ScrollRow } from "../components/ScrollRow";
 import { ListToggles } from "../components/ListToggles";
 import { LoadError, PageMessage, Status } from "../components/Status";
@@ -42,7 +41,6 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
         )}
         <NoTvNote className={heroAction.aside} />
         <ListToggles mediaType="tv" id={s.id} />
-        <PlayerChoice />
         {resume && <span className={heroAction.aside}>{timeLeft(resume.position, resume.duration)}</span>}
       </TitleHero>
       {season !== undefined && (

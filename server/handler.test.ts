@@ -101,3 +101,9 @@ test("icons and the manifest are open without a session; nothing else is", async
   for (const path of ["/icon.svg", "/apple-touch-icon.png", "/manifest.webmanifest"]) expect((await call(e, path)).status).toBe(200);
   for (const path of ["/index.html", "/icon.svg/../index.html", "/icons/icon.svg"]) expect((await call(e, path)).status).toBe(303);
 });
+
+test("the phone's manifest is public and starts at /remote", async () => {
+  const res = await call(env(), "/remote.webmanifest");
+  expect(res.status).toBe(200);
+  expect(await res.json()).toMatchObject({ start_url: "/remote", scope: "/remote" });
+});

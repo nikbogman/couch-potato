@@ -23,6 +23,23 @@ const PUBLIC = new Set(["/icon.svg", "/icon-192.png", "/icon-512.png", "/apple-t
 
 const json = (error: string, status: number) => Response.json({ error }, { status });
 
+/** The phone's install manifest: a home-screen shortcut made from a /remote page opens the remote, not the TV screen. */
+const REMOTE_MANIFEST = {
+  name: `${APP_NAME} remote`,
+  short_name: APP_NAME,
+  id: "/remote",
+  start_url: "/remote",
+  scope: "/remote",
+  display: "standalone",
+  background_color: "#0b0c0e",
+  theme_color: "#0b0c0e",
+  icons: [
+    { src: "/icon.svg", sizes: "any", type: "image/svg+xml" },
+    { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+    { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+  ],
+};
+
 /** `tmdbFetch` is injectable for tests. */
 export function createApp(tmdbFetch?: typeof globalThis.fetch) {
   const app = new Hono<{ Bindings: Env }>();
@@ -33,6 +50,7 @@ export function createApp(tmdbFetch?: typeof globalThis.fetch) {
     if (!password) return c.text(`${APP_NAME} is locked: set the COUCH_PASSWORD secret (npx wrangler secret put COUCH_PASSWORD).`, 503);
     const url = new URL(c.req.url);
     if (url.pathname === "/login") return login(c.req.raw, url, password);
+    if (url.pathname === "/remote.webmanifest") return Response.json(REMOTE_MANIFEST, { headers: { "content-type": "application/manifest+json" } });
     if (PUBLIC.has(url.pathname)) return c.env.ASSETS.fetch(c.req.raw);
     if (!(await sessionValid(readCookie(c.req.header("cookie") ?? null), password))) {
       if (url.pathname === "/ws" || url.pathname.startsWith("/api/")) return json("Unauthorized", 401);

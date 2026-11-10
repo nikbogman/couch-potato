@@ -152,6 +152,10 @@
 }
 
 .action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   height: 48px;
   border: 0;
   border-radius: 12px;
