@@ -1,4 +1,4 @@
-// WebSocket messages between the Couch server, TV screens and phone remotes. Shared by client and server.
+// WebSocket messages between the server, TV screens and phone remotes. Shared by client and server.
 import type { Target } from "./types";
 import { parseNowPlaying, parseRemoteCommand, type NowPlaying, type RemoteCommand } from "./playback";
 

@@ -10,7 +10,7 @@ const wsUrl = () => `${location.protocol === "https:" ? "wss" : "ws"}://${locati
 export type Socket = { send(m: ClientMessage): void; close(): void };
 
 /**
- * A WebSocket to the Couch server that announces `role` on every (re)connect and reconnects with backoff when it drops.
+ * A WebSocket to the server that announces `role` on every (re)connect and reconnects with backoff when it drops.
  * `onOpen(false)` fires while it's down, so a phone doesn't claim a TV it can no longer hear about.
  * Leaving the page drops the socket even when the browser keeps the page in its back/forward cache, where it would
  * otherwise stay connected: a TV that has moved on to another site would still count as open and still get casts.

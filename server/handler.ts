@@ -1,5 +1,6 @@
 // The Worker's request handling as a Hono app, kept free of Cloudflare imports so it runs under `bun test` with fake bindings.
 import { Hono } from "hono";
+import { APP_NAME } from "../shared/brand";
 import { createApi } from "./api";
 import { login } from "./auth/login";
 import { readCookie, sessionValid } from "./auth/session";
@@ -29,7 +30,7 @@ export function createApp(tmdbFetch?: typeof globalThis.fetch) {
   // One password covers everything: the shell, the API, the relay.
   app.use(async (c, next) => {
     const password = c.env.COUCH_PASSWORD;
-    if (!password) return c.text("Couch is locked: set the COUCH_PASSWORD secret (npx wrangler secret put COUCH_PASSWORD).", 503);
+    if (!password) return c.text(`${APP_NAME} is locked: set the COUCH_PASSWORD secret (npx wrangler secret put COUCH_PASSWORD).`, 503);
     const url = new URL(c.req.url);
     if (url.pathname === "/login") return login(c.req.raw, url, password);
     if (PUBLIC.has(url.pathname)) return c.env.ASSETS.fetch(c.req.raw);

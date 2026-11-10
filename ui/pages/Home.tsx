@@ -8,6 +8,7 @@ import { Status } from "../components/Status";
 import { useRemote, useBase } from "../remote/RemoteContext";
 import { focusAndReveal } from "../navigation/spatial";
 import { ListRow } from "./Lists";
+import { UpNextHero } from "../components/UpNextHero";
 import row from "../components/Row.module.css";
 import styles from "./Home.module.css";
 
@@ -24,6 +25,7 @@ export function Home() {
           Search and explore
         </Link>
       )}
+      {!remote && <UpNextHero />}
       <ContinueRow />
       <ListRow list="to_watch" hideEmpty />
     </div>

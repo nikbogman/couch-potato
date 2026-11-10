@@ -16,6 +16,10 @@
   --muted: #9a9da4;
   --accent: #f5b544; /* progress / live state only */
   --ok: #7bd88f; /* a device is connected */
+  /* Each list owns a colour and an icon (ui/components/ListBadge.tsx), everywhere it appears. */
+  --list-to_watch: #f5b544;
+  --list-watched: #7bd88f;
+  --list-favourites: #f28ab2;
   --scrim: rgb(11 12 14 / 0.85);
 
   --font-body: Inter, system-ui, sans-serif;

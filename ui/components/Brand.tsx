@@ -1,5 +1,5 @@
-// The app's name and mark, in one place: the name is still a placeholder.
-export const APP_NAME = "Working Title";
+// The app's mark. The name lives in shared/brand.ts.
+export { APP_NAME } from "../../shared/brand";
 
 /** Amber rounded square with a play glyph. */
 export function BrandMark({ size }: { size: number }) {

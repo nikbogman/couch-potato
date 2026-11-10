@@ -39,6 +39,15 @@
   padding: var(--space-7) 0;
 }
 
+.eyebrow {
+  margin-bottom: var(--space-4);
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .title {
   font-size: var(--text-3xl);
   font-weight: 700;
@@ -108,7 +117,7 @@
   cursor: default;
 }
 
-/* Secondary actions (list toggles): translucent, white when on. */
+/* Secondary actions (list toggles): translucent, filled with the list's colour (--c) when on. */
 .toggle {
   display: inline-flex;
   align-items: center;
@@ -133,7 +142,7 @@
 }
 
 .toggle[aria-pressed="true"] {
-  background: var(--text);
+  background: var(--c, var(--text));
   color: var(--ink);
 }
 

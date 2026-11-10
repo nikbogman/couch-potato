@@ -14,7 +14,7 @@ export type Key = { mediaType: MediaType; tmdbId: number };
 export type TitleInfo = { title: string; year: string | null; posterPath: string | null };
 /** A title's place in the lists. `status: null` means it isn't in them. */
 export type EntryView = { status: Status | null; favourite: boolean; watchedAt: number | null };
-/** A list row, shaped like Couch's SearchResult plus its dates. */
+/** A list row, shaped like the client's SearchResult plus its dates. */
 export type ListItem = { id: number; mediaType: MediaType } & TitleInfo & { addedAt: number; watchedAt: number | null; favourite: boolean };
 
 type Entry = { status: Status; addedAt: number; watchedAt: number | null; favourite: boolean };

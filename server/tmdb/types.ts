@@ -1,4 +1,4 @@
-// TMDB response shapes, only the fields Couch reads.
+// TMDB response shapes, only the fields the app reads.
 
 export type TmdbItem = {
   media_type?: string;
