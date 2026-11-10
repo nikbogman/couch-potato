@@ -129,5 +129,6 @@ test("players cycle in order and wrap; unknown ?player= falls back to the first"
   expect(cyclePlayer("playerthree")).toBe("playerone");
   expect(cyclePlayer("playerone", -1)).toBe("playerthree");
   expect(playerFromParam("playertwo")).toBe("playertwo");
-  expect(playerFromParam("nope")).toBe("playerone");
+  expect(playerFromParam("nope")).toBe("playerthree");
+  expect(playerFromParam(null)).toBe("playerthree");
 });

@@ -28,7 +28,7 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
   const remote = useRemote();
   const asked = Number(params.get("season"));
   const season = s.seasons.some((x) => x.season === asked) ? asked : (next?.season ?? s.seasons[0]?.season);
-  const meta = [s.years, `${s.seasons.length} season${s.seasons.length === 1 ? "" : "s"}`, s.genres.join(", ")].filter(Boolean).join(" · ");
+  const meta = [s.years, `${s.seasons.length} season${s.seasons.length === 1 ? "" : "s"}`, s.genres.slice(0, 2).join(", ")].filter(Boolean).join(" · ");
   const resume = next?.progress;
   return (
     <div className={styles.page}>

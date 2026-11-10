@@ -70,7 +70,10 @@ export const ADAPTERS: Record<PlayerId, PlayerAdapter> = {
 };
 
 export { PLAYER_IDS };
-export const playerFromParam = (v: string | null): PlayerId => PLAYER_IDS.find((p) => p === v) ?? "playerone";
+/** Where playback starts: Player 3 (playerthree), the most reliable lately. 1 and 2 stay as fallbacks. */
+export const DEFAULT_PLAYER: PlayerId = "playerthree";
+
+export const playerFromParam = (v: string | null): PlayerId => PLAYER_IDS.find((p) => p === v) ?? DEFAULT_PLAYER;
 /** The player `step` places after `from` in the list, wrapping around. */
 export const cyclePlayer = (from: PlayerId, step: 1 | -1 = 1): PlayerId => PLAYER_IDS[(PLAYER_IDS.indexOf(from) + step + PLAYER_IDS.length) % PLAYER_IDS.length]!;
 

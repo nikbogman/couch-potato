@@ -11,7 +11,7 @@ import { pressArrow } from "../navigation/spatial";
 import { PadHints } from "../components/PadHints";
 import { watchPath } from "../../shared/protocol";
 import { tvBridge } from "../remote/tvBridge";
-import { ADAPTERS, createSilenceWatch, cyclePlayer, FALLBACK_AFTER_MS, mmss, PLAYER_IDS, playerFromParam, resumePoint } from "../player/adapters";
+import { ADAPTERS, createSilenceWatch, cyclePlayer, DEFAULT_PLAYER, FALLBACK_AFTER_MS, mmss, PLAYER_IDS, playerFromParam, resumePoint } from "../player/adapters";
 import { type PlayerId } from "../../shared/types";
 import { usePlayerProgress } from "../player/usePlayerProgress";
 import { PageMessage } from "../components/Status";
@@ -119,7 +119,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     wanted.current = next;
     const at = resumePoint(now(), loaded);
     setLoaded({ ...at, player: next });
-    setParams(next === "playerone" ? {} : { player: next }, { replace: true });
+    setParams(next === DEFAULT_PLAYER ? {} : { player: next }, { replace: true });
     return at.startAt;
   };
   // A fresh load starts from our start time, not playing; tell the phone about it, and about a new title, player or next episode.

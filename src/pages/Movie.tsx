@@ -15,7 +15,7 @@ export function Movie() {
   if (isError) return <PageMessage>{error.message}.</PageMessage>;
   if (!m || progress.isPending) return <PageMessage>Loading…</PageMessage>;
   const saved = progress.data && !progress.data.finished ? progress.data : null;
-  const meta = [m.year, m.runtime && formatRuntime(m.runtime), m.genres.join(", ")].filter(Boolean).join(" · ");
+  const meta = [m.year, m.runtime && formatRuntime(m.runtime), m.genres.slice(0, 2).join(", ")].filter(Boolean).join(" · ");
   return (
     <TitleHero title={m.title} meta={meta} overview={m.overview} backdropPath={m.backdropPath}>
       <PlayButton target={{ mediaType: "movie", id: m.id }} remoteLabel={PLAY_ON_TV} className={heroAction.play} autoFocus>
