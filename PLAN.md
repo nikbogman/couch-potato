@@ -2,6 +2,14 @@
 
 For agents doing the work. "Working Title" is a placeholder name; don't bake it into identifiers (use `app` or `wt`).
 
+## Status (2026-11-10)
+
+Phases 1–9 done and deployed: https://wt.nicola-manoilov.workers.dev (Worker `wt`, D1 `wt`; Couch's Worker and D1 untouched).
+- Collection uses Couch's raw-SQL D1 pattern (`server/collection/`), not Drizzle: same rules as Popcorn, one DB access style, tests on bun:sqlite.
+- Player keeps its own band above the embed rather than an auto-hiding overlay, which would cover the embed's own controls.
+- Not verified: a real TV, a real phone, a gamepad, signing in on production.
+- Not done: tab focus-order tests (phase 3), phase 10 (share target, deferred by decision).
+
 ## Goal
 
 One web app that does both jobs:
