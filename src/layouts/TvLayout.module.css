@@ -41,14 +41,18 @@
 .nav {
   display: flex;
   gap: var(--space-2);
+  padding: 6px;
+  border-radius: var(--radius-full);
+  background: var(--veil-soft);
 }
 
 .pill {
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) 26px;
   border-radius: var(--radius-full);
-  color: var(--muted);
+  color: var(--text-soft);
+  font-size: 22px;
   font-weight: 500;
-  transition: color 140ms, background-color 140ms;
+  transition: color 180ms ease-out, background-color 180ms ease-out;
 }
 
 .pill:hover {
@@ -56,7 +60,7 @@
 }
 
 .pill:focus-visible {
-  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--text);
 }
 
 .active {
@@ -67,9 +71,4 @@
 
 .active:hover {
   color: var(--ink);
-}
-
-.clock {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }

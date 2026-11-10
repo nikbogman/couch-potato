@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
+import { APP_NAME, BrandMark } from "../components/Brand";
 import type { Target } from "../../shared/types";
 import { NowPlayingBar } from "../components/NowPlayingBar";
 import type { NowPlaying, RemoteCommand } from "../../shared/playback";
@@ -9,6 +10,30 @@ import styles from "./RemoteLayout.module.css";
 
 const NOTICE_MS = 2500;
 
+const TABS = [
+  { to: "/remote", label: "Home", end: true, icon: <path d="M4 11l8-7 8 7v9H4z" strokeLinejoin="round" /> },
+  { to: "/remote/lists", label: "Lists", icon: <path d="M5 6h14M5 12h14M5 18h9" /> },
+  { to: "/remote/now-playing", label: "Remote", icon: <><rect x="7" y="2" width="10" height="20" rx="3" /><circle cx="12" cy="9" r="2" /></> },
+  { to: "/remote/search", label: "Explore", icon: <><circle cx="12" cy="12" r="8" /><path d="M15 9l-2 4-4 2 2-4z" /></> },
+];
+
+function TabBar() {
+  return (
+    <footer className={styles.tabbar}>
+      <nav aria-label="Main">
+        {TABS.map((t) => (
+          <NavLink key={t.to} to={t.to} end={t.end} className={styles.tab}>
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              {t.icon}
+            </svg>
+            {t.label}
+          </NavLink>
+        ))}
+      </nav>
+    </footer>
+  );
+}
+
 /** Phone shell for `/remote/*`: connects as a remote, shows whether a TV is open, and offers "Play on TV" to the pages below. */
 export function RemoteLayout() {
   const [tv, setTv] = useState(false);
@@ -17,7 +42,7 @@ export function RemoteLayout() {
   const [notice, setNotice] = useState<string | null>(null);
   const { pathname, key } = useLocation();
   const navigate = useNavigate();
-  const home = pathname.replace(/\/$/, "") === "/remote";
+  const home = TABS.some((t) => t.to === pathname.replace(/\/$/, "")); // tab roots have no Back
 
   useEffect(() => {
     const s = connectSocket(
@@ -67,9 +92,9 @@ export function RemoteLayout() {
               </svg>
             </button>
           )}
-          <Link to="/remote" className={styles.wordmark}>
-            <img src="/icon.svg" alt="" width={28} height={28} />
-            couch
+          <Link to="/remote" className={styles.wordmark} translate="no">
+            <BrandMark size={28} />
+            {APP_NAME}
           </Link>
           <span className={`${styles.chip} ${tv ? styles.live : ""}`} role="status">
             <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -83,6 +108,7 @@ export function RemoteLayout() {
           <Outlet />
         </main>
         <NowPlayingBar />
+        <TabBar />
         {notice && (
           <p className={styles.notice} role="status">
             {notice}

@@ -72,9 +72,12 @@
   line-clamp: 3;
 }
 
+/* Wider than the text column, so Play and the three list toggles fit on one line. */
 .actions {
   display: flex;
   flex-wrap: wrap;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--safe-x));
   align-items: center;
   gap: var(--space-4) var(--space-5);
   margin-top: var(--space-6);
@@ -84,7 +87,7 @@
   display: inline-block;
   padding: var(--space-4) var(--space-7);
   border: 0;
-  border-radius: var(--radius-full);
+  border-radius: 16px;
   background: var(--text);
   color: var(--ink);
   font: 700 var(--text-lg) var(--font-head);
@@ -97,11 +100,45 @@
 }
 
 .play:focus-visible {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .play:disabled {
   opacity: 0.4;
+  cursor: default;
+}
+
+/* Secondary actions (list toggles): translucent, white when on. */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 0;
+  border-radius: 16px;
+  background: var(--veil);
+  color: var(--text);
+  font: 600 var(--text-md) var(--font-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 180ms ease-out, background-color 180ms ease-out;
+}
+
+.toggle:hover {
+  background: rgb(255 255 255 / 0.22);
+}
+
+.toggle:focus-visible {
+  transform: scale(1.04);
+}
+
+.toggle[aria-pressed="true"] {
+  background: var(--text);
+  color: var(--ink);
+}
+
+.toggle:disabled {
+  opacity: 0.6;
   cursor: default;
 }
 
@@ -149,9 +186,29 @@
 }
 
 :global(.remote) .actions {
+  width: auto;
   flex-direction: column;
   align-items: stretch;
   gap: var(--space-3);
+}
+
+:global(.remote) .actions:has(.toggle) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:global(.remote) .actions > :not(.toggle) {
+  grid-column: 1 / -1;
+}
+
+:global(.remote) .toggle {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 64px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
 }
 
 :global(.remote) .play {

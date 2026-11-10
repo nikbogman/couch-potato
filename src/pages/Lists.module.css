@@ -1,0 +1,184 @@
+/* TV: the three lists as rows, a clear step apart. */
+.tv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) 0 var(--space-9);
+}
+
+/* Phone (designs/phone-lists.html). */
+.phone {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: var(--space-5) var(--safe-x) 0;
+}
+
+.h1 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.segmented button {
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 180ms ease-out, color 180ms ease-out;
+}
+
+.segmented button[aria-selected="true"] {
+  background: var(--surface-3);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.filter:focus-within {
+  box-shadow: var(--ring);
+}
+
+.filter input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--text);
+  font: 400 16px var(--font-body); /* 16px: iOS doesn't zoom in */
+}
+
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.count button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.empty {
+  padding: var(--space-6) 0;
+  color: var(--muted);
+}
+
+.empty a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--surface);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.poster {
+  flex: none;
+  width: 48px;
+  height: 72px;
+  border-radius: 8px;
+  background: var(--surface);
+  object-fit: cover;
+}
+
+.grow {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.grow strong,
+.grow span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grow strong {
+  font-size: 16px;
+}
+
+.grow span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.play {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.play:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.more {
+  padding: var(--space-4) 0;
+  text-align: center;
+}

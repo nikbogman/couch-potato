@@ -1,5 +1,5 @@
 .shell {
-  padding-bottom: 104px; /* room for the Now playing bar */
+  padding-bottom: calc(168px + env(safe-area-inset-bottom)); /* room for the Now playing bar and the tab bar */
 }
 
 /* Pinned and translucent, so the wordmark, Back and TV status stay in reach while content scrolls under it. */
@@ -71,7 +71,7 @@
 .notice {
   position: fixed;
   left: 50%;
-  bottom: 100px;
+  bottom: calc(160px + env(safe-area-inset-bottom));
   z-index: 6;
   transform: translateX(-50%);
   margin: 0;
@@ -80,4 +80,41 @@
   background: var(--surface-2);
   box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
   font-weight: 600;
+}
+
+/* Bottom tabs: Home, Lists, Remote, Explore. */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgb(11 12 14 / 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--surface-2);
+}
+
+.tabbar nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 430px;
+  height: 64px;
+  margin: 0 auto;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tab[aria-current="page"] {
+  color: var(--text);
 }

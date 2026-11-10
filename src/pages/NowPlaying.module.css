@@ -88,7 +88,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-6);
+  gap: 28px;
 }
 
 .skip {
@@ -96,12 +96,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: transparent;
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
 }
@@ -116,8 +116,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -177,6 +177,5 @@
 
 button:focus-visible,
 .close:focus-visible {
-  outline-width: 3px;
-  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 5px var(--text);
 }

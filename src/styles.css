@@ -7,18 +7,19 @@
 :root {
   color-scheme: dark;
 
-  --ink: #0b0c10;
-  --surface: #16181f;
-  --surface-2: #20232c;
-  --surface-3: #2c303c; /* hover / focus fill on a surface */
-  --text: #f2f3f5;
-  --muted: #a3a9b6;
-  --accent: #ffb547; /* progress / live state only */
-  --ok: #4ade80; /* a device is connected */
-  --scrim: rgb(11 12 16 / 0.85);
+  --ink: #0b0c0e; /* page ground */
+  --surface: #16181c;
+  --surface-2: #1f2227;
+  --surface-3: #2a2d33; /* hover / focus fill on a surface */
+  --text: #f4f4f5;
+  --text-soft: #c9cbd0;
+  --muted: #9a9da4;
+  --accent: #f5b544; /* progress / live state only */
+  --ok: #7bd88f; /* a device is connected */
+  --scrim: rgb(11 12 14 / 0.85);
 
   --font-body: Inter, system-ui, sans-serif;
-  --font-head: "Space Grotesk", system-ui, sans-serif;
+  --font-head: var(--font-body); /* one family: Inter */
 
   --text-xs: 16px;
   --text-sm: 20px;
@@ -50,7 +51,10 @@
   --safe-x: var(--space-9);
   --header-h: 120px; /* the pinned TV header; scrolling keeps focused content below it */
   --measure: 56ch; /* comfortable line length for paragraphs */
-  --ring: 0 0 0 4px var(--text);
+  /* Focus: a white ring with a dark gap, so it separates from any poster. */
+  --ring: 0 0 0 4px var(--ink), 0 0 0 8px var(--text);
+  --veil: rgb(255 255 255 / 0.14);
+  --veil-soft: rgb(255 255 255 / 0.08);
 }
 
 * {
@@ -64,6 +68,7 @@ html {
 
 body {
   margin: 0;
+  font-variant-numeric: tabular-nums;
   background: var(--ink);
   color: var(--text);
   font: 400 var(--text-md) / var(--leading-normal) var(--font-body); /* 10-foot sizing */
@@ -95,8 +100,8 @@ button {
 
 /* Every focusable element gets the white ring; cards add the lift on top. */
 :focus-visible {
-  outline: 4px solid var(--text);
-  outline-offset: 4px;
+  outline: none;
+  box-shadow: var(--ring);
 }
 
 /* While focus is in a row or grid, the other cards recede so the focused one reads at a glance. */

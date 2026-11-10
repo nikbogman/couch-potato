@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from "react-router";
 import { backdropUrl, fetchSeason, fetchSeries, type EpisodeSummary, type SeriesDetails } from "../lib/api";
 import { PadHints } from "../components/PadHints";
 import { PLAY_ON_TV, NoTvNote, PlayButton } from "../components/PlayButton";
+import { ListToggles } from "../components/ListToggles";
 import { LoadError, PageMessage, Status } from "../components/Status";
 import { heroAction, TitleHero } from "../components/TitleHero";
 import { usePad } from "../navigation/gamepadInput";
@@ -38,6 +39,7 @@ function SeriesPage({ s }: { s: SeriesDetails }) {
           </PlayButton>
         )}
         <NoTvNote className={heroAction.aside} />
+        <ListToggles mediaType="tv" id={s.id} />
         {next && (
           <span className={heroAction.aside}>
             S{next.season} E{next.episode}

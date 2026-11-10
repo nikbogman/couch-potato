@@ -3,7 +3,7 @@ import { backdropUrl } from "../lib/api";
 import styles from "./TitleHero.module.css";
 
 /** Class names for what goes in the hero's action row: the primary button and the muted text beside it. */
-export const heroAction = { play: styles.play, aside: styles.aside };
+export const heroAction = { play: styles.play, toggle: styles.toggle, aside: styles.aside };
 
 /**
  * The top of a title page: backdrop fading into the page, title, meta line, overview and an action row.

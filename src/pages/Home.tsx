@@ -7,6 +7,7 @@ import { ScrollRow } from "../components/ScrollRow";
 import { Status } from "../components/Status";
 import { useRemote, useBase } from "../remote/RemoteContext";
 import { focusAndReveal } from "../navigation/spatial";
+import { ListRow } from "./Lists";
 import row from "../components/Row.module.css";
 import styles from "./Home.module.css";
 
@@ -24,6 +25,7 @@ export function Home() {
         </Link>
       )}
       <ContinueRow />
+      <ListRow list="to_watch" hideEmpty />
     </div>
   );
 }

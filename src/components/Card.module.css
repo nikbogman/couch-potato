@@ -7,13 +7,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  transition: transform 140ms ease-out;
+  transition: transform 180ms ease-out;
   /* Keyboard scrolling stops this far from the edge: the neighbouring card or row stays peeking, and a row's heading stays in view. */
   scroll-margin: 140px 120px 180px;
 }
 
 .card:hover {
-  transform: scale(1.04);
+  transform: scale(1.06);
 }
 
 /* The focused card sits above its neighbours (it overlaps them), lifts, and gets a white ring with a dark halo so it separates from any poster. */
@@ -22,12 +22,12 @@
 }
 
 .card:focus-visible {
-  outline: none;
-  transform: scale(1.08);
+  box-shadow: none; /* the ring goes on the poster */
+  transform: scale(1.06);
 }
 
 .card:focus-visible .poster {
-  box-shadow: 0 0 0 4px var(--text), 0 0 0 9px var(--ink), 0 24px 48px 8px rgb(0 0 0 / 0.7);
+  box-shadow: var(--ring), 0 24px 48px rgb(0 0 0 / 0.6);
   filter: brightness(1.08);
 }
 

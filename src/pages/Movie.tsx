@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { fetchMovie, fetchProgress } from "../lib/api";
 import { NoTvNote, PLAY_ON_TV, PlayButton } from "../components/PlayButton";
+import { ListToggles } from "../components/ListToggles";
 import { PageMessage } from "../components/Status";
 import { heroAction, TitleHero } from "../components/TitleHero";
 import { formatRuntime, timeLeft } from "../lib/format";
@@ -21,6 +22,7 @@ export function Movie() {
         {saved ? "▶ Resume" : "▶ Play"}
       </PlayButton>
       <NoTvNote className={heroAction.aside} />
+      <ListToggles mediaType="movie" id={m.id} />
       {saved && <span className={heroAction.aside}>{timeLeft(saved.position, saved.duration)}</span>}
     </TitleHero>
   );

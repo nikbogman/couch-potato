@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import type { Target } from "../../shared/types";
 import { watchPath } from "../../shared/protocol";
 import { useRemote } from "../remote/RemoteContext";
+import { APP_NAME } from "./Brand";
 
 export const PLAY_ON_TV = "▶ Play on TV";
 
@@ -41,5 +42,5 @@ export function PlayButton({
 /** Shown near a phone's Play button while no TV is connected. */
 export function NoTvNote({ className }: { className?: string }) {
   const remote = useRemote();
-  return remote && !remote.tv ? <span className={className}>Open Couch on the TV</span> : null;
+  return remote && !remote.tv ? <span className={className}>Open {APP_NAME} on the TV</span> : null;
 }

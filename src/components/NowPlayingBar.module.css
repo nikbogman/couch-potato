@@ -1,7 +1,7 @@
 .bar {
   position: fixed;
   left: 50%;
-  bottom: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom)); /* above the tab bar */
   transform: translateX(-50%);
   z-index: 5;
   width: min(406px, calc(100% - 24px));

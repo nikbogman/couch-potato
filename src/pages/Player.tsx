@@ -223,8 +223,10 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   return (
     <div className={styles.player}>
       <div ref={bar} data-bar className={styles.bar}>
-        <button type="button" className={styles.back} onClick={back}>
-          ← Back
+        <button type="button" className={styles.back} onClick={back} aria-label="Back">
+          <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
         </button>
         <div
           ref={group}

@@ -4,6 +4,7 @@ import { RemoteLayout } from "./layouts/RemoteLayout";
 import { TvLayout } from "./layouts/TvLayout";
 import { Navigation } from "./navigation/Navigation";
 import { Home } from "./pages/Home";
+import { Lists } from "./pages/Lists";
 import { Movie } from "./pages/Movie";
 import { NowPlaying } from "./pages/NowPlaying";
 import { Player } from "./pages/Player";
@@ -21,6 +22,7 @@ export function App() {
         <Route path="/remote" element={<RemoteLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<Search />} />
+          <Route path="lists" element={<Lists />} />
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<Movie />} />
           <Route path="tv/:id" element={<Series />} />
@@ -29,6 +31,7 @@ export function App() {
         <Route element={<TvLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/lists" element={<Lists />} />
           <Route path="/movie/:id" element={<Movie />} />
           <Route path="/tv/:id" element={<Series />} />
           <Route path="*" element={<PageMessage>Page not found.</PageMessage>} />
