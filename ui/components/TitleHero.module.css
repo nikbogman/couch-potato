@@ -160,7 +160,7 @@
   cursor: default;
 }
 
-/* Everything else: 14% white. `.square` is icon-only (the heart on the title page). */
+/* Everything else: 14% white. */
 .toggle {
   display: inline-flex;
   align-items: center;
@@ -178,9 +178,29 @@
   transition: transform 180ms ease-out, background-color 180ms ease-out;
 }
 
-.square {
-  width: 72px;
+/* A list icon on its own: no fill, no padding; the colour and fill say everything. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
   padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  cursor: pointer;
+  transition: transform 180ms ease-out;
+}
+
+.icon:hover,
+.icon:focus-visible {
+  transform: scale(1.1);
+}
+
+.icon:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .toggle:hover {
@@ -282,9 +302,14 @@
   font-size: 15px;
 }
 
-:global(.remote) .square {
-  width: 52px;
-  padding: 0;
+:global(.remote) .icon {
+  width: 44px;
+  height: 52px;
+}
+
+:global(.remote) .icon svg {
+  width: 32px;
+  height: 32px;
 }
 
 :global(.remote) .aside {

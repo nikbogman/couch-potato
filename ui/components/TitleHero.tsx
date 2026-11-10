@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { backdropUrl } from "../lib/api";
 import styles from "./TitleHero.module.css";
 
-/** Class names for what goes in the hero's action row: the primary button, the 14%-white ones (`square`: icon-only) and muted text. */
-export const heroAction = { play: styles.play, toggle: styles.toggle, square: `${styles.toggle} ${styles.square}`, aside: styles.aside };
+/** Class names for what goes in the hero's action row: the primary button, the 14%-white ones, bare list icons and muted text. */
+export const heroAction = { play: styles.play, toggle: styles.toggle, icon: styles.icon, aside: styles.aside };
 
 /** The filled play glyph on primary buttons (designs). */
 export const PlayGlyph = ({ size = 24 }: { size?: number }) => (

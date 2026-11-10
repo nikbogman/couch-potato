@@ -3,12 +3,11 @@ import { useParams } from "react-router";
 import { fetchMovie, fetchProgress } from "../lib/api";
 import { ListToggles } from "../components/ListToggles";
 import { NoTvNote, PLAY_ON_TV, PlayButton } from "../components/PlayButton";
-import { PlayerChoice } from "../components/PlayerChoice";
 import { PageMessage } from "../components/Status";
 import { heroAction, PlayGlyph, TitleHero } from "../components/TitleHero";
 import { formatRuntime, timeLeft } from "../lib/format";
 
-/** Movie title page (designs: TV · Title): eyebrow, title, "year · runtime · genre · ★ rating", Play or Resume, the list squares, Player N. */
+/** Movie title page (designs: TV · Title): eyebrow, title, "year · runtime · genre · ★ rating", Play or Resume, then the list icons. */
 export function Movie() {
   const { id = "" } = useParams();
   const { data: m, isError, error } = useQuery({ queryKey: ["movie", id], queryFn: () => fetchMovie(id) });
@@ -30,7 +29,6 @@ export function Movie() {
         {saved ? "Resume" : "Play"}
       </PlayButton>
       <ListToggles mediaType="movie" id={m.id} />
-      <PlayerChoice />
       <NoTvNote className={heroAction.aside} />
       {saved && <span className={heroAction.aside}>{timeLeft(saved.position, saved.duration)}</span>}
     </TitleHero>
