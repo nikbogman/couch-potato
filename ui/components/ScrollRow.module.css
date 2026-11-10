@@ -47,6 +47,12 @@
   opacity: 1;
 }
 
+/* With a pad or keyboard the focused card is the guide: no fade over it at either end. */
+.row:has(:focus-visible)::before,
+.row:has(:focus-visible)::after {
+  opacity: 0;
+}
+
 /* Mouse only: touch scrolls by swipe, the pad and keyboard by focus. */
 .arrow {
   display: none;
