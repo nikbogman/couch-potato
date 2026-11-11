@@ -4,7 +4,6 @@
 
 # couch potato
 
-**Never leave the couch.**<br>
 My monitor, turned into a TV: films, series and my lists in one ad-free app, run from my phone or a controller.
 
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?logo=cloudflareworkers&logoColor=white)
