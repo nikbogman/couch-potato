@@ -22,7 +22,7 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 
 ## Why
 
-I watch a lot of films and series, and they were spread across **too many apps, each with its own ads and subscription**. I wanted **one app, with no ads, that's free**, and that **knows my lists**: what I want to watch, what I've watched and what I loved, which used to live in a separate app. I also live in a **small studio with one monitor that doubles as my TV**, so watching meant getting up from the couch to reach for the mouse. couch potato turns that monitor into a **TV I drive with a controller**, makes my **phone the remote** for searching and playback, and **remembers where I left off**, so I never have to leave the couch.
+I watch a lot of movies and series, and they were spread across **too many apps, each with its own ads and subscription**. I wanted **one app, with no ads, that's free**, and that **knows my lists**: what I want to watch, what I've watched and what I loved. I also live in a **small studio with one monitor that doubles as my TV**, so watching meant getting up from the couch to reach for the mouse. couch potato turns that monitor into a **TV I drive with a controller**, makes my **phone the remote** for searching and playback, and **remembers where I left off**, so I never have to leave the couch.
 
 ## Architecture
 
@@ -75,7 +75,7 @@ Data comes through TanStack Query. The player wraps the embed iframe, reads its 
 
 ## Run it
 
-These are notes for myself, for setting it up again. You need [Bun](https://bun.sh), a Cloudflare account and a free [TMDB API key](https://www.themoviedb.org/settings/api).
+Notes for me, or an AI agent, to set it up again. It needs [Bun](https://bun.sh), a Cloudflare account and a free [TMDB API key](https://www.themoviedb.org/settings/api).
 
 ```sh
 bun install
