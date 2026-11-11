@@ -30,7 +30,7 @@ I watch a lot of movies and series, and they were spread across **too many apps,
 
 Everything runs on Cloudflare, within the free tier: one Worker, one D1 database and one Durable Object.
 
-### One Worker in front of everything <img src="https://cdn.simpleicons.org/cloudflareworkers/F38020" height="16" alt="">
+### The Worker <img src="https://cdn.simpleicons.org/cloudflareworkers/F38020" height="16" alt="">
 
 A single [Hono](https://hono.dev) app handles every request, in this order:
 
@@ -42,7 +42,7 @@ A single [Hono](https://hono.dev) app handles every request, in this order:
 
 The handler has no Cloudflare imports, so the whole server runs under `bun test` with in-memory fakes for D1, the assets binding and the relay.
 
-### Phone and TV, kept in sync <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
+### The phone-to-TV relay <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
 A single Durable Object holds one "room" in which TVs and phones meet over WebSocket:
 
@@ -55,7 +55,7 @@ A single Durable Object holds one "room" in which TVs and phones meet over WebSo
 
 The message types live in `shared/protocol.ts` and are checked on both sides.
 
-### Lists and progress in D1 <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
+### The database <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
 D1 (SQLite) holds two tables:
 
@@ -64,7 +64,7 @@ D1 (SQLite) holds two tables:
 
 Migrations are in `migrations/`.
 
-### Two screens, one app
+### The TV and phone apps
 
 One React 19 app serves both screens:
 
@@ -103,7 +103,7 @@ bun run deploy
 
 Then I open the Worker's URL on the monitor, sign in, and open the same URL on my phone to get the remote.
 
-## Good to know
+## Notes
 
 - Built for one person, me: there are no accounts, just the one password.
 - The app doesn't host or store video. Playback comes from third-party embed players, and their availability is outside this app's control.
