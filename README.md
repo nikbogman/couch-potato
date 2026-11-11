@@ -20,23 +20,9 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 > [!NOTE]
 > This is a personal project, built for me and my setup. It isn't meant for anyone else to use yet: there are no accounts, no onboarding and no support, and it's shaped around my habits.
 
-## The problem
+## Why
 
-**Too many apps, ads and subscriptions.** I watch a lot of films and series, and they're spread across many apps, each with its own ads and its own subscription. I wanted one app, with no ads and no subscription.
-
-**My lists lived somewhere else.** I kept what I want to watch, what I've watched and what I loved in a separate app. It had nothing to do with actually playing anything.
-
-**My TV is my monitor.** I live in a small studio with one monitor, which is also my TV. Watching meant getting up from the couch to reach for the mouse and keyboard every time I wanted to search, pause or pick the next episode.
-
-## My solution
-
-- **One app, no ads, free.** I browse trending films and series, search, and open title pages with seasons and episodes, with no ads or subscriptions. Video comes from free embed players.
-- **My lists are built in.** To watch, Watched (with the date) and Favourites, for films and series. When I finish something, it's already where I'll look next. My old Popcorn lists were imported, so nothing was lost.
-- **The monitor becomes a TV.** The interface is built for watching from across the room: big type, and one white focus ring that I move with a controller or the arrow keys. A mouse still works when I'm at the desk.
-- **I never leave the couch.** My phone is the remote: search, lists, "play on TV", play/pause, seek, fullscreen, next episode, switch player and stop. Typing happens on the phone, not on the TV.
-- **It remembers where I was.** Progress is saved while I watch, and Home opens on "Continue watching" and the next episode.
-- **If a player fails, it moves on.** The default embed player falls back to the next one if a video doesn't start.
-- **It's private.** One password protects everything: the app, the API and the phone-to-TV relay.
+I watch a lot of films and series, and they were spread across **too many apps, each with its own ads and subscription**. I wanted **one app, with no ads, that's free**, and that **knows my lists**: what I want to watch, what I've watched and what I loved, which used to live in a separate app. I also live in a **small studio with one monitor that doubles as my TV**, so watching meant getting up from the couch to reach for the mouse. couch potato turns that monitor into a **TV I drive with a controller**, makes my **phone the remote** for searching and playback, and **remembers where I left off**, so I never have to leave the couch.
 
 ## Architecture
 
