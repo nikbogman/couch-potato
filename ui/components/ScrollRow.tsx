@@ -1,22 +1,18 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { pageTarget } from "../navigation/scroll";
 import styles from "./ScrollRow.module.css";
 
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 const Chevron = ({ back }: { back?: boolean }) => (
-  <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+  <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d={back ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7"} />
   </svg>
 );
 
 /**
- * A horizontally scrolling row of cards for mouse users (the pad and keyboard use spatial focus and scroll it themselves):
- * chevron buttons on both ends page by about a visible width, appear while the pointer is over the row, and hide at the start/end;
- * a fade at an end that has more behind it hints there is more. The native scrollbar stays hidden; wheel (shift+wheel, trackpad swipe) works as usual.
- * The buttons stay out of the focus order and never take focus from a card.
+ * A horizontally scrolling row of cards. The pad and keyboard scroll it by moving focus; touch by swiping.
+ * A mouse gets round arrows at both ends (only while the mouse is the input in use: html[data-mouse]), plus shift+wheel and trackpad swipes.
+ * `wheel`: the plain wheel scrolls the row sideways too (for a row with nothing under it); at either end it scrolls the page as usual.
  */
-export function ScrollRow({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function ScrollRow({ children, className = "", wheel = false }: { children: ReactNode; className?: string; wheel?: boolean }) {
   const track = useRef<HTMLUListElement>(null);
   const [edge, setEdge] = useState({ start: true, end: true });
   useEffect(() => {
@@ -27,24 +23,30 @@ export function ScrollRow({ children, className = "" }: { children: ReactNode; c
       const end = el.scrollLeft > el.scrollWidth - el.clientWidth - 2;
       setEdge((p) => (p.start === start && p.end === end ? p : { start, end }));
     };
+    const onWheel = (e: WheelEvent) => {
+      if (e.shiftKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return; // already sideways
+      const max = el.scrollWidth - el.clientWidth;
+      if ((e.deltaY < 0 && el.scrollLeft <= 0) || (e.deltaY > 0 && el.scrollLeft >= max - 1)) return; // at the end: let the page scroll
+      e.preventDefault();
+      el.scrollLeft += e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY;
+    };
     update();
     el.addEventListener("scroll", update, { passive: true });
-    const ro = new ResizeObserver(update); // the viewport changing size
-    const mo = new MutationObserver(update); // cards arriving or leaving
+    if (wheel) el.addEventListener("wheel", onWheel, { passive: false });
+    const ro = new ResizeObserver(update);
+    const mo = new MutationObserver(update);
     ro.observe(el);
     mo.observe(el, { childList: true });
-    return () => (el.removeEventListener("scroll", update), ro.disconnect(), mo.disconnect());
-  }, []);
+    return () => (el.removeEventListener("scroll", update), el.removeEventListener("wheel", onWheel), ro.disconnect(), mo.disconnect());
+  }, [wheel]);
+  // About a screen along, keeping the safe margin so the next card isn't cut in half at the edge.
   const page = (dir: 1 | -1) => {
     const el = track.current;
-    if (!el) return;
-    const offsets = [...el.children].map((c) => (c as HTMLElement).offsetLeft);
-    const left = pageTarget(dir, { scrollLeft: el.scrollLeft, view: el.clientWidth, max: el.scrollWidth - el.clientWidth, offsets });
-    el.scrollTo({ left, behavior: reducedMotion() ? "instant" : "smooth" });
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   };
-  const hold = (e: React.MouseEvent) => e.preventDefault(); // a click must not move focus onto the button: arrow keys would then start from it
+  const hold = (e: React.MouseEvent) => e.preventDefault(); // clicking an arrow must not take focus off the card
   return (
-    <div className={styles.row} data-start={edge.start} data-end={edge.end}>
+    <div className={styles.row}>
       <button type="button" tabIndex={-1} className={`${styles.arrow} ${styles.prev}`} aria-label="Scroll back" disabled={edge.start} onMouseDown={hold} onClick={() => page(-1)}>
         <Chevron back />
       </button>

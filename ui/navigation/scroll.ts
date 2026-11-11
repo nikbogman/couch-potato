@@ -27,15 +27,3 @@ export function revealX(o: { left: number; right: number; view: number; scrollLe
   const d = o.left < lo ? o.left - lo : o.right > hi ? o.right - hi : 0;
   return clamp(o.scrollLeft + d, o.max);
 }
-
-/**
- * scrollLeft after a chevron click: about one visible width in `dir`, landing a card on the safe-area edge so no card is cut in half
- * and none is skipped unseen. `offsets` are the cards' lefts in content coordinates.
- */
-export function pageTarget(dir: 1 | -1, o: { scrollLeft: number; view: number; max: number; offsets: number[] }): number {
-  const raw = o.scrollLeft + dir * (o.view - 2 * SAFE);
-  if (raw >= o.max) return o.max;
-  if (raw <= 0) return 0;
-  const stops = o.offsets.map((x) => x - SAFE).filter((s) => (dir > 0 ? s <= raw && s > o.scrollLeft + 1 : s >= raw && s < o.scrollLeft - 1));
-  return stops.length ? (dir > 0 ? Math.max(...stops) : Math.min(...stops)) : raw;
-}

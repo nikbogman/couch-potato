@@ -71,6 +71,13 @@ function focusables(root: ParentNode): HTMLElement[] {
   );
 }
 
+/** The mouse moving onto something focusable moves focus there, so the mouse and the pad share one highlight. Never steals from a field being typed in. */
+export function focusUnderPointer(target: EventTarget | null) {
+  const el = target instanceof Element ? target.closest<HTMLElement>(FOCUSABLE) : null;
+  if (!el || el.tabIndex < 0 || el === document.activeElement || isTextEntry(document.activeElement)) return;
+  el.focus({ preventScroll: true, focusVisible: true } as FocusOptions);
+}
+
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**

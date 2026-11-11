@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { pageTarget, revealX, rowScrollTop } from "./scroll";
+import { revealX, rowScrollTop } from "./scroll";
 
 // Page scroll for a focused row (document coordinates).
 const row = { rowTop: 1000, focusBottom: 1480, view: 1080, max: 5000, header: 112 };
@@ -41,23 +41,3 @@ test("the ends of the row keep the safe-area padding and never overshoot", () =>
 
 // Chevron paging: about one visible width, landing on a card boundary, never skipping a card unseen.
 const offsets = [96, 328, 560, 792, 1024, 1256, 1488, 1720, 1952, 2184, 2416, 2648]; // card lefts in content coordinates
-const pg = { view: 1920, max: 2880, offsets };
-
-test("paging forward lands a card on the safe-area edge, about a page along", () => {
-  const t = pageTarget(1, { ...pg, scrollLeft: 0 });
-  expect(t).toBeGreaterThan(1200);
-  expect(t).toBeLessThanOrEqual(1920 - 192);
-  expect(offsets).toContain(t + 96);
-});
-
-test("paging back mirrors it and clamps to the start; paging forward clamps to the end", () => {
-  expect(pageTarget(-1, { ...pg, scrollLeft: 300 })).toBe(0);
-  expect(pageTarget(1, { ...pg, scrollLeft: 2000 })).toBe(2880);
-  const back = pageTarget(-1, { ...pg, scrollLeft: 1760 });
-  expect(back).toBeLessThan(1760);
-  expect(offsets).toContain(back + 96);
-});
-
-test("paging always makes progress, even with no cards to snap to", () => {
-  expect(pageTarget(1, { view: 1920, max: 2880, offsets: [], scrollLeft: 0 })).toBe(1728);
-});

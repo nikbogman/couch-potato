@@ -1,5 +1,5 @@
 // GET/POST /login: the password form, and the cookie once the password matches.
-import { APP_NAME } from "../../shared/brand";
+import { APP_NAME, MARK, markPaths } from "../../shared/brand";
 import { passwordMatches, sessionValue, setCookie } from "./session";
 
 /** Where to go after login: same-site paths only (no `//host`, no backslash tricks). */
@@ -27,7 +27,7 @@ export const loginPage = (next: string, error = false) => `<!doctype html>
   p { margin: 0; color: #f28ab2; }
 </style></head>
 <body><form method="post" action="/login">
-  <h1><svg width="40" height="40" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="150" fill="#F5B544"/><path d="M190 140 L388 256 L190 372 Z" fill="none" stroke="#0B0C0E" stroke-width="40" stroke-linejoin="round"/></svg>${APP_NAME}</h1>
+  <h1><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7.2" fill="${MARK.ink}" stroke="rgb(255 255 255 / 0.12)" stroke-width="0.5"/><g transform="translate(4.08 4.08) scale(0.66)">${markPaths(MARK.amber, 2)}</g></svg>${APP_NAME}</h1>
   ${error ? "<p>Wrong password.</p>" : ""}
   <input type="password" name="password" placeholder="Password" autocomplete="current-password" autofocus required>
   <input type="hidden" name="next" value="${esc(next)}">

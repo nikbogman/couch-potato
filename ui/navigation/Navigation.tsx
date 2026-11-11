@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useNavigationType } from "react-router";
 import { HELP_EVENT } from "../components/ControllerHelp";
 import { isDirection } from "./gamepad";
 import { startPad, usePad } from "./gamepadInput";
-import { focusAndReveal, isTextEntry, jumpFocus, moveFocus, pressArrow, restoreFocus, type Dir, type Jump } from "./spatial";
+import { focusAndReveal, focusUnderPointer, isTextEntry, jumpFocus, moveFocus, pressArrow, restoreFocus, type Dir, type Jump } from "./spatial";
 
 const ARROWS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
 const JUMPS: Record<string, Jump> = { Home: "home", End: "end", PageUp: "pageUp", PageDown: "pageDown" };
@@ -62,7 +62,28 @@ export function Navigation() {
     return () => window.removeEventListener("keydown", onKey);
   }, [off, watching]);
 
+  useEffect(() => {
+    if (off || watching) return;
+    // Real movement only: content scrolling under a parked pointer must not pull focus away from the pad.
+    // html[data-mouse] marks the mouse as the input in use (row arrows show); any key or pad press clears it.
+    const root = document.documentElement;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || !(e.movementX || e.movementY)) return;
+      root.dataset.mouse = "";
+      focusUnderPointer(e.target);
+    };
+    const onKey = () => void delete root.dataset.mouse;
+    addEventListener("pointermove", onMove, { passive: true });
+    addEventListener("keydown", onKey, true);
+    return () => {
+      removeEventListener("pointermove", onMove);
+      removeEventListener("keydown", onKey, true);
+      onKey();
+    };
+  }, [off, watching]);
+
   usePad((a) => {
+    delete document.documentElement.dataset.mouse;
     const dialog = document.querySelector<HTMLDialogElement>("dialog[open]");
     if (isDirection(a)) return pressArrow(a);
     if (a === "b") return dialog ? dialog.close() : back();

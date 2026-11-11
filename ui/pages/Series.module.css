@@ -85,10 +85,6 @@
   transition: transform 140ms ease-out, background-color 140ms;
 }
 
-.row:hover {
-  background: var(--surface-2);
-}
-
 .row:focus-visible {
   background: var(--surface-3);
   transform: scale(1.02);
@@ -270,8 +266,7 @@
   transition: transform 180ms ease-out, box-shadow 180ms ease-out;
 }
 
-.card:focus-visible .frame,
-.card:hover .frame {
+.card:focus-visible .frame {
   transform: scale(1.06);
   box-shadow: var(--ring), 0 24px 48px rgb(0 0 0 / 0.6);
 }

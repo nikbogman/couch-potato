@@ -125,7 +125,7 @@ function Picker({ s, season, select }: { s: SeriesDetails; season: number; selec
           ))}
         </ul>
       ) : (
-        <ScrollRow className={styles.cards}>
+        <ScrollRow className={styles.cards} wheel>
           {episodes.map((e) => (
             <li key={e.episode} className={styles.cardItem}>
               <EpisodeCard id={s.id} season={season} e={e} />

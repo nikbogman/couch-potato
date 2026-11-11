@@ -12,10 +12,6 @@
   scroll-margin: 140px 120px 180px;
 }
 
-.card:hover {
-  transform: scale(1.06);
-}
-
 /* The focused card sits above its neighbours (it overlaps them), lifts, and gets a white ring with a dark halo so it separates from any poster. */
 .wrap:has(.card:focus-visible) {
   z-index: 2;
