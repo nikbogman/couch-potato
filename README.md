@@ -81,7 +81,7 @@ Notes for me, or an AI agent, to set it up again. It needs [Bun](https://bun.sh)
 bun install
 cp .dev.vars.example .dev.vars   # fill in TMDB_API_KEY and COUCH_PASSWORD
 bun run build
-npx wrangler d1 migrations apply wt --local
+npx wrangler d1 migrations apply couch-potato --local
 bun run dev                      # serves on the local network, so the phone can reach it
 ```
 
@@ -95,7 +95,7 @@ bun run typecheck
 ## Deploy to Cloudflare
 
 ```sh
-npx wrangler d1 migrations apply wt --remote
+npx wrangler d1 migrations apply couch-potato --remote
 npx wrangler secret put COUCH_PASSWORD
 npx wrangler secret put TMDB_API_KEY
 bun run deploy
