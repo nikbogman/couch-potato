@@ -4,8 +4,8 @@
 
 # couch potato
 
-**Your own streaming front end for the living room.**<br>
-Find a film or series, keep it on a list, press play on the TV, and use your phone as the remote.
+**My own TV for a one-monitor studio.**<br>
+I find something to watch, keep it on my lists, and play it on my monitor, all from the couch with my phone or a controller.
 
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?logo=cloudflareworkers&logoColor=white)
 ![D1](https://img.shields.io/badge/D1-F38020?logo=cloudflare&logoColor=white)
@@ -17,24 +17,28 @@ Find a film or series, keep it on a list, press play on the TV, and use your pho
 
 </div>
 
+> [!NOTE]
+> This is a personal project, built for me and my setup. It isn't meant for anyone else to use yet: there are no accounts, no onboarding and no support, and it's shaped around my habits.
+
 ## The problem
 
-Watching something at home used to take three tools and a lot of friction:
+**Deciding what to watch was the worst part.** There are too many apps, each with its own ads, its own subscription and its own idea of what I should watch. None of them knew what I'd already seen or wanted to see, so most evenings started with twenty minutes of scrolling.
 
-- **Deciding.** "What do we watch tonight?" means scrolling several apps, none of which knows what you've already seen or saved.
-- **Remembering.** Lists of films to watch and films you loved live in a separate app (Popcorn), with no link to the TV.
-- **Playing.** The TV side (Couch) could play a title, but typing on a TV with a remote or controller is slow, and the list wasn't there.
+**My lists lived somewhere else.** I kept what I want to watch, what I've watched and what I loved in a separate app (Popcorn). It had nothing to do with actually playing anything.
 
-couch potato merges both apps into one: a single place that knows your lists and your progress, puts the film on the big screen, and lets your phone do the typing.
+**My TV is my monitor.** I live in a small studio with one monitor, which is also my TV. Watching meant getting up from the couch to reach for the mouse and keyboard every time I wanted to search, pause or pick the next episode.
 
-## What it does
+## My solution
 
-- **Browse on the TV.** Trending films and series, search, title pages, seasons and episodes. Built for 10 feet: one white focus ring that a controller, keyboard or mouse moves.
-- **Your lists.** To watch, Watched (with the date) and Favourites, for films and series. A favourite is always watched; unwatching removes the title.
-- **Pick up where you left off.** Progress is saved while you watch. Home leads with "Continue watching" and the next episode.
-- **Phone as remote.** Open the app on your phone and it becomes the remote: search, lists, "play on TV", play/pause, seek, fullscreen, next episode, switch player and stop.
-- **Players with fallback.** Video comes from third-party embed players. If the default doesn't start, it falls back to the next one.
-- **Private.** One password protects everything: the app, the API and the relay.
+couch potato is my answer to all three, in one app:
+
+- **One place to decide, for free.** I browse trending films and series, search, and open title pages with seasons and episodes, with no ads or subscriptions. Video comes from free embed players.
+- **My lists are built in.** To watch, Watched (with the date) and Favourites, for films and series. When I finish something, it's already where I'll look next. My old Popcorn lists were imported, so nothing was lost.
+- **The monitor becomes a TV.** The interface is built for watching from across the room: big type, and one white focus ring that I move with a controller or the arrow keys. A mouse still works when I'm at the desk.
+- **I never leave the couch.** My phone is the remote: search, lists, "play on TV", play/pause, seek, fullscreen, next episode, switch player and stop. Typing happens on the phone, not on the TV.
+- **It remembers where I was.** Progress is saved while I watch, and Home opens on "Continue watching" and the next episode.
+- **If a player fails, it moves on.** The default embed player falls back to the next one if a video doesn't start.
+- **It's private.** One password protects everything: the app, the API and the phone-to-TV relay.
 
 ## Architecture
 
@@ -72,7 +76,7 @@ The message types live in `shared/protocol.ts` and are checked on both sides.
 D1 (SQLite) holds two tables:
 
 - **`collection`**: one row per title (`media_type` + `tmdb_id`), with its status, dates and favourite flag. The rules are enforced by the schema itself: a title is watched exactly when it has a watched date, and a favourite must be watched. Title, year and poster are copied from TMDB once, so lists load without calling TMDB.
-- **`progress`**: position and duration per film or episode, updated as you watch.
+- **`progress`**: position and duration per film or episode, updated as I watch.
 
 Migrations are in `migrations/`.
 
@@ -87,14 +91,14 @@ Data comes through TanStack Query. The player wraps the embed iframe, reads its 
 
 ## Run it
 
-You need [Bun](https://bun.sh), a Cloudflare account and a free [TMDB API key](https://www.themoviedb.org/settings/api).
+These are notes for myself, for setting it up again. You need [Bun](https://bun.sh), a Cloudflare account and a free [TMDB API key](https://www.themoviedb.org/settings/api).
 
 ```sh
 bun install
 cp .dev.vars.example .dev.vars   # fill in TMDB_API_KEY and COUCH_PASSWORD
 bun run build
 npx wrangler d1 migrations apply wt --local
-bun run dev                      # serves on your network, so the phone can reach it
+bun run dev                      # serves on the local network, so the phone can reach it
 ```
 
 Checks:
@@ -113,10 +117,10 @@ npx wrangler secret put TMDB_API_KEY
 bun run deploy
 ```
 
-Then open the Worker's URL on the TV, sign in, and open the same URL on your phone to get the remote.
+Then I open the Worker's URL on the monitor, sign in, and open the same URL on my phone to get the remote.
 
 ## Notes
 
-- Built for one household: there are no accounts, just the one password.
+- Built for one person, me: there are no accounts, just the one password.
 - The app doesn't host or store video. Playback comes from third-party embed players, and their availability is outside this app's control.
 - Film and series data comes from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.
