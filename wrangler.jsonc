@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "wt",
+  "name": "couch-potato",
   "main": "worker/index.ts",
   "compatibility_date": "2026-11-01",
   // Secrets (not here): TMDB_API_KEY, COUCH_PASSWORD. Locally they come from .dev.vars.
