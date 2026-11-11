@@ -4,8 +4,8 @@
 
 # couch potato
 
-**My own TV for a one-monitor studio.**<br>
-I find something to watch, keep it on my lists, and play it on my monitor, all from the couch with my phone or a controller.
+**Never leave the couch.**<br>
+My monitor, turned into a TV: films, series and my lists in one ad-free app, run from my phone or a controller.
 
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?logo=cloudflareworkers&logoColor=white)
 ![D1](https://img.shields.io/badge/D1-F38020?logo=cloudflare&logoColor=white)
@@ -20,17 +20,17 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 > [!NOTE]
 > This is a personal project, built for me and my setup. It isn't meant for anyone else to use yet: there are no accounts, no onboarding and no support, and it's shaped around my habits.
 
-## Why
+## Why I built it
 
 I watch a lot of movies and series, and they were spread across **too many apps, each with its own ads and subscription**. I wanted **one app, with no ads, that's free**, and that **knows my lists**: what I want to watch, what I've watched and what I loved. I also live in a **small studio with one monitor that doubles as my TV**, so watching meant getting up from the couch to reach for the mouse. couch potato turns that monitor into a **TV I drive with a controller**, makes my **phone the remote** for searching and playback, and **remembers where I left off**, so I never have to leave the couch.
 
-## Architecture
+## How it works
 
 ![Architecture: TV and phone talk to one Cloudflare Worker, which serves the UI, talks to D1, relays TV and phone messages through a Durable Object, and proxies TMDB. Video plays in third-party iframes loaded by the TV.](docs/architecture.svg)
 
 Everything runs on Cloudflare, within the free tier: one Worker, one D1 database and one Durable Object.
 
-### The Worker <img src="https://cdn.simpleicons.org/cloudflareworkers/F38020" height="16" alt="">
+### One Worker in front of everything <img src="https://cdn.simpleicons.org/cloudflareworkers/F38020" height="16" alt="">
 
 A single [Hono](https://hono.dev) app handles every request, in this order:
 
@@ -42,7 +42,7 @@ A single [Hono](https://hono.dev) app handles every request, in this order:
 
 The handler has no Cloudflare imports, so the whole server runs under `bun test` with in-memory fakes for D1, the assets binding and the relay.
 
-### The relay <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
+### Phone and TV, kept in sync <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
 A single Durable Object holds one "room" in which TVs and phones meet over WebSocket:
 
@@ -55,7 +55,7 @@ A single Durable Object holds one "room" in which TVs and phones meet over WebSo
 
 The message types live in `shared/protocol.ts` and are checked on both sides.
 
-### The database <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
+### Lists and progress in D1 <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
 D1 (SQLite) holds two tables:
 
@@ -64,7 +64,7 @@ D1 (SQLite) holds two tables:
 
 Migrations are in `migrations/`.
 
-### The clients
+### Two screens, one app
 
 One React 19 app serves both screens:
 
@@ -73,7 +73,7 @@ One React 19 app serves both screens:
 
 Data comes through TanStack Query. The player wraps the embed iframe, reads its progress events and saves progress back to the Worker.
 
-## Run it
+## Run it locally
 
 Notes for me, or an AI agent, to set it up again. It needs [Bun](https://bun.sh), a Cloudflare account and a free [TMDB API key](https://www.themoviedb.org/settings/api).
 
@@ -92,7 +92,7 @@ bun test
 bun run typecheck
 ```
 
-## Deploy
+## Deploy to Cloudflare
 
 ```sh
 npx wrangler d1 migrations apply wt --remote
@@ -103,7 +103,7 @@ bun run deploy
 
 Then I open the Worker's URL on the monitor, sign in, and open the same URL on my phone to get the remote.
 
-## Notes
+## Good to know
 
 - Built for one person, me: there are no accounts, just the one password.
 - The app doesn't host or store video. Playback comes from third-party embed players, and their availability is outside this app's control.
