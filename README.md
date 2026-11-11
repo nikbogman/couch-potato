@@ -22,15 +22,13 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 
 ## The problem
 
-**Too many apps, ads and subscriptions.** I watch a lot of films and series, and they're spread across many apps, each with its own ads and its own subscription. I wanted one app, with no ads.
+**Too many apps, ads and subscriptions.** I watch a lot of films and series, and they're spread across many apps, each with its own ads and its own subscription. I wanted one app, with no ads and no subscription.
 
-**My lists lived somewhere else.** I kept what I want to watch, what I've watched and what I loved in a separate app (Popcorn). It had nothing to do with actually playing anything.
+**My lists lived somewhere else.** I kept what I want to watch, what I've watched and what I loved in a separate app. It had nothing to do with actually playing anything.
 
 **My TV is my monitor.** I live in a small studio with one monitor, which is also my TV. Watching meant getting up from the couch to reach for the mouse and keyboard every time I wanted to search, pause or pick the next episode.
 
 ## My solution
-
-couch potato is my answer to all three, in one app:
 
 - **One app, no ads, free.** I browse trending films and series, search, and open title pages with seasons and episodes, with no ads or subscriptions. Video comes from free embed players.
 - **My lists are built in.** To watch, Watched (with the date) and Favourites, for films and series. When I finish something, it's already where I'll look next. My old Popcorn lists were imported, so nothing was lost.
