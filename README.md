@@ -32,7 +32,7 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 
 couch potato is my answer to all three, in one app:
 
-- **One place to decide, for free.** I browse trending films and series, search, and open title pages with seasons and episodes, with no ads or subscriptions. Video comes from free embed players.
+- **One app, no ads, free.** I browse trending films and series, search, and open title pages with seasons and episodes, with no ads or subscriptions. Video comes from free embed players.
 - **My lists are built in.** To watch, Watched (with the date) and Favourites, for films and series. When I finish something, it's already where I'll look next. My old Popcorn lists were imported, so nothing was lost.
 - **The monitor becomes a TV.** The interface is built for watching from across the room: big type, and one white focus ring that I move with a controller or the arrow keys. A mouse still works when I'm at the desk.
 - **I never leave the couch.** My phone is the remote: search, lists, "play on TV", play/pause, seek, fullscreen, next episode, switch player and stop. Typing happens on the phone, not on the TV.
