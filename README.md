@@ -22,7 +22,7 @@ I find something to watch, keep it on my lists, and play it on my monitor, all f
 
 ## The problem
 
-**Deciding what to watch was the worst part.** There are too many apps, each with its own ads, its own subscription and its own idea of what I should watch. None of them knew what I'd already seen or wanted to see, so most evenings started with twenty minutes of scrolling.
+**Deciding what to watch was the worst part.** There are too many apps, each with its own ads, its own subscription and its own idea of what I should watch. None of them knew what I'd already seen or wanted to see, so most evenings started with a long scroll instead of a film.
 
 **My lists lived somewhere else.** I kept what I want to watch, what I've watched and what I loved in a separate app (Popcorn). It had nothing to do with actually playing anything.
 
