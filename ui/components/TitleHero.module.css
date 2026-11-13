@@ -211,12 +211,6 @@
   transform: scale(1.04);
 }
 
-/* On: white fill, dark text. Amber is never a button colour (style tile). */
-.toggle[aria-pressed="true"] {
-  background: var(--text);
-  color: var(--ink);
-}
-
 .toggle:disabled {
   opacity: 0.6;
   cursor: default;

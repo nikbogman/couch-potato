@@ -32,7 +32,7 @@ export function UpNextHero() {
           Play
         </PlayButton>
       )}
-      <ListToggles mediaType={first.mediaType} id={first.id} only={["watched"]} labelled />
+      <ListToggles mediaType={first.mediaType} id={first.id} only={["watched"]} />
       <Link to={`/${first.mediaType}/${first.id}`} className={heroAction.toggle}>
         More info
       </Link>

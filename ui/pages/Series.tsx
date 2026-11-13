@@ -5,6 +5,7 @@ import { backdropUrl, fetchSeason, fetchSeries, type EpisodeSummary, type Series
 import { PLAY_ON_TV, NoTvNote, PlayButton } from "../components/PlayButton";
 import { ScrollRow } from "../components/ScrollRow";
 import { ListToggles } from "../components/ListToggles";
+import { ListIcon } from "../components/ListBadge";
 import { LoadError, PageMessage, Status } from "../components/Status";
 import { heroAction, PlayGlyph, TitleHero } from "../components/TitleHero";
 import { usePad } from "../navigation/gamepadInput";
@@ -161,7 +162,7 @@ function EpisodeRow({ id, season, e }: { id: number; season: number; e: EpisodeS
       </div>
       {p?.finished && (
         <span className={styles.check} role="img" aria-label="Watched">
-          ✓
+          <ListIcon list="watched" size={44} />
         </span>
       )}
       {remote && (

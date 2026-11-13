@@ -84,7 +84,7 @@ function Counter({ list, selected, onSelect }: { list: List; selected: boolean; 
       style={{ "--c": listColor(list) } as CSSProperties}
       onClick={onSelect}
     >
-      <ListIcon list={list} color={selected ? "var(--ink)" : listColor(list)} filled={!(selected && list === "watched")} />
+      <ListIcon list={list} color={selected ? "var(--ink)" : listColor(list)} mark={selected ? listColor(list) : undefined} />
       <span className={styles.figure}>
         <span className={styles.number}>{total ?? "–"}</span>
         <span className={styles.what}>{COUNTED[list]}</span>
