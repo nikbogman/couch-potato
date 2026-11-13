@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "couch potato",
+  "version": "0.1.0",
+  "identifier": "dev.couchpotato.tv",
+  "build": { "frontendDist": "./splash" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "splash",
+        "title": "couch potato",
+        "url": "index.html",
+        "maximized": true,
+        "backgroundColor": "#0b0c0e"
+      },
+      {
+        "label": "main",
+        "title": "couch potato",
+        "url": "https://couch-potato.nicola-manoilov.workers.dev",
+        "maximized": true,
+        "visible": false,
+        "backgroundColor": "#0b0c0e",
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --autoplay-policy=no-user-gesture-required"
+      }
+    ]
+  },
+  "bundle": { "active": true, "targets": ["nsis"], "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"] }
+}

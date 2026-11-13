@@ -1,9 +1,10 @@
 import { PLAYER_IDS, type PlayerId, type Target } from "../../shared/types";
-import { playerthreeUrl, playeroneMovieUrl, playeroneTvUrl, playertwoUrl } from "./embedUrls";
+import { p3Url, p1MovieUrl, p1TvUrl, p2Url } from "./embedUrls";
 import { clamp01, type PlaybackCommand } from "../../shared/playback";
 import type { PlayerEvent } from "./playerEvent";
-import { parseTaggedMessage, parseplayeroneMessage } from "./playerone";
-import { parseplayerthreeMessage } from "./playerthree";
+import { parseTaggedMessage } from "./tagged";
+import { HOSTS, tagOf } from "./hosts";
+import { parseEnvelopeMessage } from "./envelope";
 
 
 /** What `command` needs to know about the player: where it is, and whether it is playing. */
@@ -26,7 +27,7 @@ const seekTime = (cmd: PlaybackCommand, now: PlaybackNow) => {
   return Math.round(Math.max(0, now.duration > 0 ? Math.min(to, now.duration) : to));
 };
 
-/** The `{action}` dialect that playerone, playertwo and playerthree share. */
+/** The `{action}` dialect that Player 1, Player 2 and Player 3 share. */
 const actionCommand = (cmd: PlaybackCommand, now: PlaybackNow): object => {
   switch (cmd.cmd) {
     case "seekTo": case "seekBy": return { action: "seek", time: seekTime(cmd, now) };
@@ -38,46 +39,46 @@ const actionCommand = (cmd: PlaybackCommand, now: PlaybackNow): object => {
 };
 
 export const ADAPTERS: Record<PlayerId, PlayerAdapter> = {
-  playerone: {
-    id: "playerone",
+  p1: {
+    id: "p1",
     label: "1",
-    url: (t, startAt) => (t.mediaType === "tv" ? playeroneTvUrl(t.id, t.season, t.episode, startAt) : playeroneMovieUrl(t.id, startAt)),
-    // playerone is trusted by its `source` tag, not the origin.
+    url: (t, startAt) => (t.mediaType === "tv" ? p1TvUrl(t.id, t.season, t.episode, startAt) : p1MovieUrl(t.id, startAt)),
+    // Player 1 is trusted by its `source` tag, not the origin.
     parse(_origin, data) {
-      const e = parseplayeroneMessage(data);
+      const e = parseTaggedMessage(tagOf(HOSTS.p1), data);
       return e ? [e] : [];
     },
     command: actionCommand,
   },
-  playertwo: {
-    id: "playertwo",
+  p2: {
+    id: "p2",
     label: "2",
-    url: playertwoUrl,
-    // Tagged like playerone. It has no `ready`, so the first valid event is preceded by one.
+    url: p2Url,
+    // Tagged like Player 1. It has no `ready`, so the first valid event is preceded by one.
     parse(_origin, data, _current, first) {
-      const e = parseTaggedMessage("playertwo-player", data);
+      const e = parseTaggedMessage(tagOf(HOSTS.p2), data);
       return !e ? [] : first ? [{ kind: "ready", currentTime: e.currentTime, duration: e.duration }, e] : [e];
     },
     command: actionCommand,
   },
-  playerthree: {
-    id: "playerthree",
+  p3: {
+    id: "p3",
     label: "3",
-    url: playerthreeUrl,
-    parse: (origin, data, current) => parseplayerthreeMessage(origin, data, current),
+    url: p3Url,
+    parse: (origin, data, current) => parseEnvelopeMessage(origin, data, current),
     command: actionCommand,
   },
 };
 
 export { PLAYER_IDS };
-/** Where playback starts: Player 3 (playerthree), the most reliable lately. 1 and 2 stay as fallbacks. */
-export const DEFAULT_PLAYER: PlayerId = "playerthree";
+/** Where playback starts: Player 3 (Player 3), the most reliable lately. 1 and 2 stay as fallbacks. */
+export const DEFAULT_PLAYER: PlayerId = "p3";
 
 export const playerFromParam = (v: string | null): PlayerId => PLAYER_IDS.find((p) => p === v) ?? DEFAULT_PLAYER;
 /** The player `step` places after `from` in the list, wrapping around. */
 export const cyclePlayer = (from: PlayerId, step: 1 | -1 = 1): PlayerId => PLAYER_IDS[(PLAYER_IDS.indexOf(from) + step + PLAYER_IDS.length) % PLAYER_IDS.length]!;
 
-/** playerone gets this long to say anything before we fall back to playertwo. */
+/** Player 1 gets this long to say anything before we fall back to Player 2. */
 export const FALLBACK_AFTER_MS = 15_000;
 
 type Timers = { set: (fn: () => void, ms: number) => unknown; clear: (handle: unknown) => void };

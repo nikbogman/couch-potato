@@ -26,6 +26,10 @@ export function phoneToast(cmd: RemoteCommand, playingAfter: boolean): string | 
   return null;
 }
 
+/** The couch potato desktop app's window (Tauri, which injects `__TAURI__`), or undefined in a browser. */
+type DesktopWindow = { setFullscreen(on: boolean): Promise<void>; isFullscreen(): Promise<boolean>; onResized(f: () => void): Promise<() => void> };
+const desktopWindow: DesktopWindow | undefined = (globalThis as { __TAURI__?: { window: { getCurrentWindow(): DesktopWindow } } }).__TAURI__?.window.getCurrentWindow();
+
 const STARTUP_MS = 15_000; // how long after a load the player gets its one "is it really playing?" check
 const NOTE_MS = 6000; // how long the "switched" note stays (it fades over the same time)
 
@@ -63,8 +67,20 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
   });
   const episodeName = episodes?.find((e) => e.episode === episode)?.name;
   const phone = usePhoneConnected();
-  // Fullscreen (from the phone, or F on a keyboard): our band hides so the video fills the screen.
-  const [full, setFull] = useState(false);
+  // Real fullscreen (the page's, the player's own button, or the desktop app's window), read back from the source: the band hides only then.
+  const [full, setFull] = useState(() => !!document.fullscreenElement);
+  useEffect(() => {
+    const read = () => void (desktopWindow?.isFullscreen() ?? Promise.resolve(false)).then((w) => setFull(w || !!document.fullscreenElement));
+    // The desktop app's web view fills only the window when the video goes fullscreen; the window follows it in and out,
+    // so the video's own button (or Esc) enters and leaves fullscreen in one step.
+    const follow = () => void desktopWindow?.setFullscreen(!!document.fullscreenElement).then(read);
+    document.addEventListener("fullscreenchange", desktopWindow ? follow : read);
+    const unlisten = desktopWindow?.onResized(read);
+    return () => {
+      document.removeEventListener("fullscreenchange", desktopWindow ? follow : read);
+      void unlisten?.then((u) => u());
+    };
+  }, []);
   const frame = useRef<HTMLIFrameElement>(null);
   const playback = useState(createPlaybackState)[0];
   // What the iframe was loaded with. It must not follow the URL: auto-next moves the URL and the video plays on.
@@ -158,12 +174,12 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     if (loaded) reporter.push();
   }, [loaded, title, art, next, here, full, episodeName]);
   const fallBack = useEffectEvent(() => {
-    const at = switchTo("playertwo");
+    const at = switchTo("p2");
     if (at !== null) setNote(`Player 1 didn't respond, switched to player 2 at ${mmss(at)}`);
   });
-  // playerone gets FALLBACK_AFTER_MS from load to say anything. Only playerone falls back, so this can't loop.
+  // Player 1 gets FALLBACK_AFTER_MS from load to say anything. Only Player 1 falls back, so this can't loop.
   useEffect(() => {
-    if (loaded?.player !== "playerone") return;
+    if (loaded?.player !== "p1") return;
     const w = (silence.current = createSilenceWatch(FALLBACK_AFTER_MS, () => fallBack()));
     return () => w.cancel();
   }, [loaded]);
@@ -185,19 +201,24 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     if (!a) return;
     // To the iframe (where the players document their command listener) and, if different, to the window its events
     // come from (a nested player frame). Commands are absolute, so whichever listens, both hearing it does no harm.
+    send(a.command(cmd, { ...playback.get() }));
+  };
+  const send = (payload: object) => {
     const top = frame.current?.contentWindow;
     const events = source() as Window | null;
-    const payload = a.command(cmd, { ...playback.get() });
     top?.postMessage(payload, "*");
     if (events && events !== top) events.postMessage(payload, "*");
   };
   const goNext = () => next && void leave().then(() => navigate({ pathname: watchPath({ mediaType: "tv", id, ...next }), search }));
+  // The player is told too (its own fullscreen UI), though a browser lets it go fullscreen only after a press on the TV.
+  // In the desktop app the window itself goes fullscreen, which needs no press. In a browser, a command from the phone
+  // has no press behind it, so the browser refuses unless a policy allows it (AutomaticFullscreenAllowedForUrls).
   const toggleFull = () => {
     const on = !full;
-    setFull(on);
-    // Browsers usually allow this only after a press on the TV itself; the hidden band is the part that always works.
-    if (on) document.documentElement.requestFullscreen?.().catch(() => {});
-    else if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    send({ action: on ? "enterFullscreen" : "exitFullscreen" });
+    if (desktopWindow) void desktopWindow.setFullscreen(on);
+    else if (on) document.documentElement.requestFullscreen?.().catch(() => setNote("TV browser blocked full screen. Press F or click the video"));
+    if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   };
   const run = useEffectEvent((cmd: RemoteCommand) => {
     if (cmd.cmd === "stop") back();
@@ -238,9 +259,9 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     if (inBar() && isDirection(a)) return pressArrow(a); // Menu put focus on the top bar: the d-pad drives it
     if (inBar() && a === "a" && el instanceof HTMLElement) return el.click();
     const c = playbackFor(a);
-    if (c === "back") back();
+    if (c === "back") full ? toggleFull() : back(); // in fullscreen, Back leaves fullscreen first
     else if (c === "menu") {
-      if (full) setFull(false); // Menu brings the band back
+      if (full) toggleFull(); // Menu leaves fullscreen, bringing the band back
       else if (inBar() && el instanceof HTMLElement) el.blur();
       else group.current?.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
     } else if (c) {
@@ -249,7 +270,8 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     }
   });
   const onKey = useEffectEvent((e: KeyboardEvent) => {
-    if (e.key === "Escape" || e.key === "Backspace") back();
+    if ((e.key === "Escape" || e.key === "Backspace") && full) toggleFull(); // fullscreen first, as browsers do with Esc
+    else if (e.key === "Escape" || e.key === "Backspace") back();
     else if ((e.key === "f" || e.key === "F") && !inBar()) toggleFull();
   });
   useEffect(() => {

@@ -1,0 +1,7 @@
+{
+  "identifier": "remote",
+  "description": "The deployed app may make its window fullscreen and read whether it is.",
+  "windows": ["main"],
+  "remote": { "urls": ["https://couch-potato.nicola-manoilov.workers.dev/*"] },
+  "permissions": ["core:window:allow-set-fullscreen", "core:window:allow-is-fullscreen", "core:event:allow-listen", "core:event:allow-unlisten"]
+}

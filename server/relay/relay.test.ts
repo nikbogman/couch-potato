@@ -90,7 +90,7 @@ test("a TV cannot cast, a remote cannot become a TV, and nobody can speak before
 });
 
 const state = (title: string) =>
-  ({ target: movie, title, episode: null, art: null, position: 5, duration: 100, playing: true, muted: false, volume: 1, player: "playerone", canNext: false, fullscreen: false, episodeName: null }) as const;
+  ({ target: movie, title, episode: null, art: null, position: 5, duration: 100, playing: true, muted: false, volume: 1, player: "p1", canNext: false, fullscreen: false, episodeName: null }) as const;
 
 test("a command goes to the active TV only", () => {
   const { relay, tv, remote } = setup();

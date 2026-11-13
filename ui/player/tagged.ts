@@ -13,7 +13,7 @@ const KINDS: Record<string, PlayerEvent["kind"]> = {
 
 const seconds = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0);
 
-/** Turn a raw `message` payload into a PlayerEvent. Anything not tagged `source: <source>`, or an unknown event, is null. playertwo speaks the same dialect under its own tag. */
+/** Turn a raw `message` payload into a PlayerEvent. Anything not tagged `source: <source>`, or an unknown event, is null. Player 2 speaks the same dialect under its own tag. */
 export function parseTaggedMessage(source: string, data: unknown): PlayerEvent | null {
   if (typeof data !== "object" || data === null) return null;
   const m = data as Record<string, unknown>;
@@ -33,4 +33,3 @@ export function parseTaggedMessage(source: string, data: unknown): PlayerEvent |
   return e;
 }
 
-export const parseplayeroneMessage = (data: unknown) => parseTaggedMessage("playerone-player", data);

@@ -2,7 +2,7 @@
 import { clamp01, type PlaybackCommand } from "../../shared/playback";
 import type { PlayerEvent } from "./playerEvent";
 
-/** The player's live numbers, from its events and from our own commands (playerone never reports volume). */
+/** The player's live numbers, from its events and from our own commands (Player 1 never reports volume). */
 export function createPlaybackState() {
   const s = { position: 0, duration: 0, playing: false, muted: false, volume: 1 };
   return {

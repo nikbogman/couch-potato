@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { HOSTS, tagOf } from "./hosts";
 import type { Target } from "../../shared/types";
 import { ADAPTERS, createSilenceWatch, cyclePlayer, mmss, playerFromParam, resumePoint } from "./adapters";
 
@@ -6,18 +7,18 @@ const movie: Target = { mediaType: "movie", id: 603 };
 const ep: Target = { mediaType: "tv", id: 1396, season: 1, episode: 2 };
 
 test("each adapter builds its own url for the same target", () => {
-  expect(ADAPTERS.playerone.url(movie, 90)).toBe("https://player-one.test/movie/603?t=90&autoplay=1");
-  expect(ADAPTERS.playerone.url(ep, 0)).toBe("https://player-one.test/tv/1396/1/2?autoplay=1&autonext=1");
+  expect(ADAPTERS.p1.url(movie, 90)).toBe(`${HOSTS.p1}/movie/603?t=90&autoplay=1`);
+  expect(ADAPTERS.p1.url(ep, 0)).toBe(`${HOSTS.p1}/tv/1396/1/2?autoplay=1&autonext=1`);
 });
 
 test("each adapter ignores the other's messages", () => {
-  const vn = { source: "playerone-player", event: "timeupdate", currentTime: 5, duration: 100 };
+  const vn = { source: tagOf(HOSTS.p1), event: "timeupdate", currentTime: 5, duration: 100 };
   const eb = { type: "PLAYER_EVENT", data: { player_info: { tmdb: 603 }, player_status: "timeupdate", player_progress: 5, player_duration: 100 } };
   const want = [{ kind: "timeupdate" as const, currentTime: 5, duration: 100 }];
-  expect(ADAPTERS.playerone.parse("https://player-one.test", vn, movie, false)).toEqual(want);
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb, movie, false)).toEqual(want);
-  expect(ADAPTERS.playerone.parse("https://player-three.test", eb, movie, false)).toEqual([]);
-  expect(ADAPTERS.playerthree.parse("https://player-one.test", vn, movie, false)).toEqual([]);
+  expect(ADAPTERS.p1.parse(`${HOSTS.p1}`, vn, movie, false)).toEqual(want);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb, movie, false)).toEqual(want);
+  expect(ADAPTERS.p1.parse(`${HOSTS.p3}`, eb, movie, false)).toEqual([]);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p1}`, vn, movie, false)).toEqual([]);
 });
 
 test("silence watch fires once after the timeout when nothing is heard", () => {
@@ -81,12 +82,12 @@ function fakeTimers() {
 
 const now = { position: 100, duration: 1000, playing: true };
 
-test("playerone commands use { action }; togglePlay becomes an explicit play or pause", () => {
-  const c = (cmd: Parameters<typeof ADAPTERS.playerone.command>[0]) => ADAPTERS.playerone.command(cmd, now);
+test("Player 1 commands use { action }; togglePlay becomes an explicit play or pause", () => {
+  const c = (cmd: Parameters<typeof ADAPTERS.p1.command>[0]) => ADAPTERS.p1.command(cmd, now);
   expect(c({ cmd: "play" })).toEqual({ action: "play" });
   expect(c({ cmd: "pause" })).toEqual({ action: "pause" });
   expect(c({ cmd: "togglePlay" })).toEqual({ action: "pause" });
-  expect(ADAPTERS.playerone.command({ cmd: "togglePlay" }, { ...now, playing: false })).toEqual({ action: "play" });
+  expect(ADAPTERS.p1.command({ cmd: "togglePlay" }, { ...now, playing: false })).toEqual({ action: "play" });
   expect(c({ cmd: "getStatus" })).toEqual({ action: "getStatus" });
   expect(c({ cmd: "seekTo", time: 42 })).toEqual({ action: "seek", time: 42 });
   expect(c({ cmd: "seekBy", delta: 30 })).toEqual({ action: "seek", time: 130 });
@@ -97,38 +98,38 @@ test("playerone commands use { action }; togglePlay becomes an explicit play or 
   expect(c({ cmd: "setMuted", muted: false })).toEqual({ action: "unmute" });
 });
 
-test("playertwo and playerthree: urls, events and the shared command dialect", () => {
-  expect(ADAPTERS.playertwo.url(movie, 90)).toBe("https://player-two.test/movie/603?t=90");
-  expect(ADAPTERS.playertwo.url(ep, 0)).toBe("https://player-two.test/tv/1396/1/2");
-  expect(ADAPTERS.playerthree.url(movie, 90)).toBe("https://player-three.test/embed/movie?tmdb=603&autoplay=1&startAt=90");
-  expect(ADAPTERS.playerthree.url(ep, 0)).toBe("https://player-three.test/embed/tv?tmdb=1396&season=1&episode=2&autoplay=1&autonext=1");
+test("Player 2 and Player 3: urls, events and the shared command dialect", () => {
+  expect(ADAPTERS.p2.url(movie, 90)).toBe(`${HOSTS.p2}/movie/603?t=90`);
+  expect(ADAPTERS.p2.url(ep, 0)).toBe(`${HOSTS.p2}/tv/1396/1/2`);
+  expect(ADAPTERS.p3.url(movie, 90)).toBe(`${HOSTS.p3}/embed/movie?tmdb=603&autoplay=1&startAt=90`);
+  expect(ADAPTERS.p3.url(ep, 0)).toBe(`${HOSTS.p3}/embed/tv?tmdb=1396&season=1&episode=2&autoplay=1&autonext=1`);
 
-  const vs = { source: "playertwo-player", event: "pause", currentTime: 5, duration: 100 };
-  expect(ADAPTERS.playertwo.parse("https://player-two.test", vs, movie, false)).toEqual([{ kind: "pause", currentTime: 5, duration: 100 }]);
-  expect(ADAPTERS.playertwo.parse("https://player-two.test", vs, movie, true)[0]).toEqual({ kind: "ready", currentTime: 5, duration: 100 });
-  expect(ADAPTERS.playertwo.parse("https://player-one.test", { ...vs, source: "playerone-player" }, movie, false)).toEqual([]);
+  const vs = { source: tagOf(HOSTS.p2), event: "pause", currentTime: 5, duration: 100 };
+  expect(ADAPTERS.p2.parse(`${HOSTS.p2}`, vs, movie, false)).toEqual([{ kind: "pause", currentTime: 5, duration: 100 }]);
+  expect(ADAPTERS.p2.parse(`${HOSTS.p2}`, vs, movie, true)[0]).toEqual({ kind: "ready", currentTime: 5, duration: 100 });
+  expect(ADAPTERS.p2.parse(`${HOSTS.p1}`, { ...vs, source: tagOf(HOSTS.p1) }, movie, false)).toEqual([]);
 
   const eb = (status: string, extra = {}) => ({ type: "PLAYER_EVENT", data: { player_info: { tmdb: 603 }, player_status: status, player_progress: 5, player_duration: 100, ...extra } });
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb("paused"), movie, false)).toEqual([{ kind: "pause", currentTime: 5, duration: 100 }]);
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb("completed"), movie, false)[0]?.kind).toBe("ended");
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb("playerstatus", { state: "paused", muted: true }), movie, false)[0]).toMatchObject({ kind: "status", paused: true, muted: true });
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb("next_episode", { player_info: { tmdb: 1396 }, next_season: 1, next_episode: 3 }), ep, false)).toEqual([{ kind: "episodechange", currentTime: 5, duration: 100, season: 1, episode: 3 }]);
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", eb("buffering"), movie, false)).toEqual([]);
-  expect(ADAPTERS.playerthree.parse("https://elsewhere.test", eb("paused"), movie, false)).toEqual([]);
-  expect(ADAPTERS.playerthree.parse("https://player-three.test", { ...eb("paused"), data: { ...eb("paused").data, player_info: { tmdb: 1 } } }, movie, false)).toEqual([]);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb("paused"), movie, false)).toEqual([{ kind: "pause", currentTime: 5, duration: 100 }]);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb("completed"), movie, false)[0]?.kind).toBe("ended");
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb("playerstatus", { state: "paused", muted: true }), movie, false)[0]).toMatchObject({ kind: "status", paused: true, muted: true });
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb("next_episode", { player_info: { tmdb: 1396 }, next_season: 1, next_episode: 3 }), ep, false)).toEqual([{ kind: "episodechange", currentTime: 5, duration: 100, season: 1, episode: 3 }]);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, eb("buffering"), movie, false)).toEqual([]);
+  expect(ADAPTERS.p3.parse("https://elsewhere.test", eb("paused"), movie, false)).toEqual([]);
+  expect(ADAPTERS.p3.parse(`${HOSTS.p3}`, { ...eb("paused"), data: { ...eb("paused").data, player_info: { tmdb: 1 } } }, movie, false)).toEqual([]);
 
   const now = { position: 100, duration: 1000, playing: true };
-  for (const id of ["playerone", "playertwo", "playerthree"] as const) {
+  for (const id of ["p1", "p2", "p3"] as const) {
     expect(ADAPTERS[id].command({ cmd: "seekBy", delta: 30 }, now)).toEqual({ action: "seek", time: 130 });
     expect(ADAPTERS[id].command({ cmd: "togglePlay" }, now)).toEqual({ action: "pause" });
   }
 });
 
 test("players cycle in order and wrap; unknown ?player= falls back to the first", () => {
-  expect(cyclePlayer("playerone")).toBe("playertwo");
-  expect(cyclePlayer("playerthree")).toBe("playerone");
-  expect(cyclePlayer("playerone", -1)).toBe("playerthree");
-  expect(playerFromParam("playertwo")).toBe("playertwo");
-  expect(playerFromParam("nope")).toBe("playerthree");
-  expect(playerFromParam(null)).toBe("playerthree");
+  expect(cyclePlayer("p1")).toBe("p2");
+  expect(cyclePlayer("p3")).toBe("p1");
+  expect(cyclePlayer("p1", -1)).toBe("p3");
+  expect(playerFromParam("p2")).toBe("p2");
+  expect(playerFromParam("nope")).toBe("p3");
+  expect(playerFromParam(null)).toBe("p3");
 });

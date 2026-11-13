@@ -1,7 +1,7 @@
 import type { Target } from "../../shared/types";
 import type { PlayerEvent } from "./playerEvent";
 
-const ORIGIN = "https://player-three.test";
+import { HOSTS } from "./hosts";
 
 const KINDS: Record<string, PlayerEvent["kind"]> = {
   ready: "ready",
@@ -15,9 +15,9 @@ const KINDS: Record<string, PlayerEvent["kind"]> = {
 
 const seconds = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0);
 
-/** A `message` from an playerthree iframe as shared PlayerEvents. Other origins, other titles and statuses we don't use (buffering, server_changed, error) are []. */
-export function parseplayerthreeMessage(origin: string, data: unknown, current: Target): PlayerEvent[] {
-  if (origin !== ORIGIN || typeof data !== "object" || data === null) return [];
+/** A `message` from an Player 3 iframe as shared PlayerEvents. Other origins, other titles and statuses we don't use (buffering, server_changed, error) are []. */
+export function parseEnvelopeMessage(origin: string, data: unknown, current: Target): PlayerEvent[] {
+  if (origin !== HOSTS.p3 || typeof data !== "object" || data === null) return [];
   const m = data as { type?: unknown; data?: unknown };
   if (m.type !== "PLAYER_EVENT" || typeof m.data !== "object" || m.data === null) return [];
   const d = m.data as Record<string, any>;
