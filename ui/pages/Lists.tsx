@@ -16,21 +16,6 @@ const LISTS: List[] = ["to_watch", "watched", "favourites"];
 const COUNTED: Record<List, string> = { to_watch: "to go", watched: "seen", favourites: "loved" };
 const watchedOn = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" });
 
-/** TV: the three lists as rows. Phone: one list at a time under three counter squares. */
-export function Lists() {
-  return useRemote() ? <PhoneLists /> : <TvLists />;
-}
-
-function TvLists() {
-  return (
-    <div className={styles.tv}>
-      {LISTS.map((l) => (
-        <ListRow key={l} list={l} />
-      ))}
-    </div>
-  );
-}
-
 /** A list's first page as a row of poster cards (TV Home's To watch row too), headed "To watch · 23". Empty says so. */
 export function ListRow({ list, hideEmpty = false }: { list: List; hideEmpty?: boolean }) {
   const base = useBase();
@@ -72,7 +57,7 @@ export function ListRow({ list, hideEmpty = false }: { list: List; hideEmpty?: b
 }
 
 /** One counter square: the list's icon and its size. The selected one fills with the list's colour. */
-function Counter({ list, selected, onSelect }: { list: List; selected: boolean; onSelect: () => void }) {
+function Counter({ list, selected, onSelect, big }: { list: List; selected: boolean; onSelect: () => void; big: boolean }) {
   const total = useList(list).data?.pages[0]?.total;
   return (
     <button
@@ -84,7 +69,7 @@ function Counter({ list, selected, onSelect }: { list: List; selected: boolean; 
       style={{ "--c": listColor(list) } as CSSProperties}
       onClick={onSelect}
     >
-      <ListIcon list={list} color={selected ? "var(--ink)" : listColor(list)} mark={selected ? listColor(list) : undefined} />
+      <ListIcon list={list} size={big ? 36 : 22} color={selected ? "var(--ink)" : listColor(list)} mark={selected ? listColor(list) : undefined} />
       <span className={styles.figure}>
         <span className={styles.number}>{total ?? "–"}</span>
         <span className={styles.what}>{COUNTED[list]}</span>
@@ -93,7 +78,10 @@ function Counter({ list, selected, onSelect }: { list: List; selected: boolean; 
   );
 }
 
-function PhoneLists() {
+/** One list at a time under three counter squares (designs: Lists · 4): rows on the phone, a poster grid on the TV. */
+export function Lists() {
+  const remote = useRemote();
+  const base = useBase();
   const [params, setParams] = useSearchParams();
   const list = LISTS.find((l) => l === params.get("list")) ?? "to_watch";
   // Newest first, no filter (designs: Lists · 4).
@@ -113,11 +101,11 @@ function PhoneLists() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, items.length]);
 
   return (
-    <div className={styles.phone}>
+    <div className={`${styles.page} ${remote ? "" : styles.tv}`}>
       <h1 className={styles.h1}>My lists</h1>
       <div className={styles.counters} role="tablist" aria-label="List">
         {LISTS.map((l) => (
-          <Counter key={l} list={l} selected={l === list} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />
+          <Counter key={l} list={l} selected={l === list} big={!remote} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />
         ))}
       </div>
       <section role="tabpanel" aria-label={LIST_LABELS[list]}>
@@ -127,13 +115,19 @@ function PhoneLists() {
           <Status>Loading…</Status>
         ) : !items.length ? (
           <p className={styles.empty}>
-            Nothing here yet. <Link to="/remote/search">Find something in Explore</Link>
+            Nothing here yet. <Link to={`${base}/search`}>Find something in Explore</Link>
           </p>
         ) : (
-          <ul className={styles.list}>
-            {items.map((r) => (
-              <ListRowItem key={`${r.mediaType}-${r.id}`} r={r} list={list} />
-            ))}
+          <ul className={remote ? styles.list : styles.grid} data-cards={remote ? undefined : ""}>
+            {items.map((r) =>
+              remote ? (
+                <ListRowItem key={`${r.mediaType}-${r.id}`} r={r} list={list} />
+              ) : (
+                <li key={`${r.mediaType}-${r.id}`}>
+                  <Card r={r} badge />
+                </li>
+              ),
+            )}
             {hasNextPage && (
               <li ref={sentinel} className={styles.more}>
                 <Status>Loading more…</Status>

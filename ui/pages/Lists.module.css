@@ -1,13 +1,5 @@
-/* TV: the three lists as rows, a clear step apart. */
-.tv {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  padding: var(--space-6) 0 var(--space-9);
-}
-
-/* Phone (designs/phone-lists.html). */
-.phone {
+/* Phone (designs/phone-lists.html); the TV has the same layout at 10 feet (.tv, at the end). */
+.page {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -166,4 +158,45 @@
 .more {
   padding: var(--space-4) 0;
   text-align: center;
+}
+
+/* TV: the phone's layout, scaled up, with a poster grid in place of the rows. */
+.tv {
+  gap: var(--space-6);
+  padding: var(--space-6) var(--safe-x) var(--space-9);
+}
+
+.tv .h1 {
+  font-size: 48px;
+}
+
+.tv .counters {
+  grid-template-columns: repeat(3, 220px);
+  gap: var(--space-5);
+}
+
+.tv .counter {
+  padding: 22px;
+  border-radius: 28px;
+}
+
+.tv .number {
+  font-size: 64px;
+}
+
+.tv .what {
+  font-size: 20px;
+}
+
+.tv .empty {
+  font-size: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
