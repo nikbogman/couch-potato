@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router";
 import { posterUrl } from "../lib/api";
 import { addedAgo } from "../lib/added";
@@ -100,13 +100,30 @@ export function Lists() {
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, items.length]);
 
+  // The counters stick under the header and shrink to pills once the heading has scrolled away under it.
+  const heading = useRef<HTMLHeadingElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const h = heading.current;
+    if (!h || !bar.current) return;
+    const top = parseFloat(getComputedStyle(bar.current).top) || 0;
+    const io = new IntersectionObserver(([e]) => e && setStuck(!e.isIntersecting && e.boundingClientRect.top < top), { rootMargin: `-${top}px 0px 0px 0px` });
+    io.observe(h);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className={`${styles.page} ${remote ? "" : styles.tv}`}>
-      <h1 className={styles.h1}>My lists</h1>
-      <div className={styles.counters} role="tablist" aria-label="List">
-        {LISTS.map((l) => (
-          <Counter key={l} list={l} selected={l === list} big={!remote} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />
-        ))}
+      <h1 ref={heading} className={styles.h1}>
+        My lists
+      </h1>
+      <div ref={bar} className={styles.bar} data-stuck={stuck || undefined}>
+        <div className={styles.counters} role="tablist" aria-label="List">
+          {LISTS.map((l) => (
+            <Counter key={l} list={l} selected={l === list} big={!remote} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />
+          ))}
+        </div>
       </div>
       <section role="tabpanel" aria-label={LIST_LABELS[list]}>
         {q.isError ? (

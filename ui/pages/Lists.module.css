@@ -12,6 +12,25 @@
   letter-spacing: -0.02em;
 }
 
+/* Pinned under the header, so the lists can be switched from anywhere down the page. */
+.bar {
+  position: sticky;
+  top: calc(var(--header-h) + env(safe-area-inset-top));
+  z-index: 4;
+  margin: 0 calc(-1 * var(--safe-x));
+  padding: 8px var(--safe-x);
+  background: var(--ink);
+}
+
+/* Focus moved by the pad stays clear of the header and the pinned counters. */
+:global(html):has(.bar) {
+  scroll-padding-top: calc(var(--header-h) + 112px);
+}
+
+:global(html):has(:global(.remote) .bar) {
+  scroll-padding-top: 128px;
+}
+
 /* Three counter squares as tabs (designs: Lists · 4). Each carries its list's colour in --c. */
 .counters {
   display: grid;
@@ -32,7 +51,7 @@
   color: var(--text);
   text-align: left;
   cursor: pointer;
-  transition: background-color 180ms ease-out, color 180ms ease-out;
+  transition: background-color 180ms ease-out, color 180ms ease-out, padding 180ms ease-out;
 }
 
 .counter[aria-selected="true"] {
@@ -199,4 +218,50 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Pinned: each square becomes a pill of icon, number and label in a line. */
+.bar[data-stuck] .counter {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  aspect-ratio: auto;
+  padding: 8px 10px;
+  border-radius: var(--radius-full);
+}
+
+.bar[data-stuck] .figure {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+
+.bar[data-stuck] .number {
+  font-size: 18px;
+}
+
+.bar[data-stuck] .what {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv .bar {
+  padding-block: var(--space-4);
+}
+
+.tv .bar[data-stuck] .counter {
+  gap: 14px;
+  padding: 14px 24px;
+}
+
+.tv .bar[data-stuck] .number {
+  font-size: 36px;
+}
+
+/* Room below the grid, so a short list can still scroll the counters up to their pinned size. */
+.tv {
+  padding-bottom: calc(var(--space-9) + 160px);
 }
