@@ -10,7 +10,7 @@ import { focusAndReveal } from "../navigation/spatial";
 import { ListRow } from "./Lists";
 import { UpNextHero } from "../components/UpNextHero";
 import { APP_NAME, BrandMark } from "../components/Brand";
-import { TvStatus } from "../components/TvStatus";
+import { AccountLink, TvStatus } from "../components/TvStatus";
 import row from "../components/Row.module.css";
 import styles from "./Home.module.css";
 
@@ -25,7 +25,10 @@ export function Home() {
             <BrandMark size={32} />
             {APP_NAME}
           </h1>
-          <TvStatus />
+          <span style={{ display: "flex", gap: "var(--space-2)" }}>
+            <TvStatus />
+            <AccountLink />
+          </span>
         </div>
       )}
       {!remote && <UpNextHero />}

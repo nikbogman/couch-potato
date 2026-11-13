@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router";
+import { fetchMe } from "../lib/account";
 import { useRemote } from "../remote/RemoteContext";
 
 /** Phone: a TV icon in a pill, green while a TV is open (icon only, no label). */
@@ -14,5 +17,19 @@ export function TvStatus() {
         <path d="M8 21h8M12 17v4" />
       </svg>
     </span>
+  );
+}
+
+/** Phone: the account's initial in a pill; opens Settings. */
+export function AccountLink() {
+  const me = useQuery({ queryKey: ["me"], queryFn: fetchMe });
+  return (
+    <Link
+      to="/remote/settings"
+      aria-label={me.data ? `Settings, signed in as ${me.data.name}` : "Settings"}
+      style={{ display: "grid", placeItems: "center", width: 44, height: 44, borderRadius: 999, background: "var(--accent)", color: "var(--ink)", fontWeight: 700, textDecoration: "none", flex: "none" }}
+    >
+      {me.data?.name[0]?.toUpperCase()}
+    </Link>
   );
 }

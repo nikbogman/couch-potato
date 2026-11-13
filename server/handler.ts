@@ -2,23 +2,24 @@
 import { Hono } from "hono";
 import { APP_NAME } from "../shared/brand";
 import { createApi } from "./api";
-import { login } from "./auth/login";
-import { readCookie, sessionValid } from "./auth/session";
+import { createAccounts, type Role, type User } from "./auth/accounts";
+import { accountRoute, publicRoute, type AuthDeps } from "./auth/routes";
+import { readCookie } from "./auth/session";
 import { collectionRoutes } from "./collection/routes";
 import { createProgressStore, type D1Like } from "./progress/store";
 import { createTmdb } from "./tmdb/client";
 
 export type Env = {
-  /** Secrets. Until COUCH_PASSWORD is set the Worker refuses everything. */
-  COUCH_PASSWORD?: string;
   TMDB_API_KEY?: string;
   DB: D1Like;
   ASSETS: { fetch(req: Request): Promise<Response> };
-  /** The single relay Durable Object namespace. */
+  /** One relay Durable Object per user, by user id. */
   RELAY: { getByName(name: string): { fetch(req: Request): Promise<Response> } };
+  /** Rate limit for sign-in, pairing and invites, per IP. Absent in tests and local dev without it. */
+  LIMITER?: { limit(o: { key: string }): Promise<{ success: boolean }> };
 };
 
-/** Served without the cookie: the login page and the OS (home-screen icon, manifest) fetch them before anyone signs in. */
+/** Served without a session: the sign-in pages and the OS (home-screen icon, manifest) fetch them before anyone signs in. */
 const PUBLIC = new Set(["/icon.svg", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/manifest.webmanifest"]);
 
 const json = (error: string, status: number) => Response.json({ error }, { status });
@@ -40,22 +41,52 @@ const REMOTE_MANIFEST = {
   ],
 };
 
+/** Phones sign in with a password; everything else (TVs, the desktop app, laptops) pairs. webOS says "SmartTV", not "Mobi". */
+const isPhone = (ua: string | undefined) => /Mobi|iPhone/i.test(ua ?? "");
+const isRemotePath = (path: string) => path === "/remote" || path.startsWith("/remote/");
+
 /** `tmdbFetch` is injectable for tests. */
 export function createApp(tmdbFetch?: typeof globalThis.fetch) {
-  const app = new Hono<{ Bindings: Env }>();
+  const app = new Hono<{ Bindings: Env; Variables: { user: User } }>();
 
-  // One password covers everything: the shell, the API, the relay.
+  const deps = (env: Env): AuthDeps => ({
+    accounts: createAccounts(env.DB),
+    async kick(userId: number, role: Role, code: number) {
+      await env.RELAY.getByName(String(userId)).fetch(new Request(`https://relay/kick?role=${role}&code=${code}`, { method: "POST" }));
+    },
+    async limited(req: Request) {
+      if (!env.LIMITER) return false;
+      return !(await env.LIMITER.limit({ key: req.headers.get("cf-connecting-ip") ?? "local" })).success;
+    },
+  });
+
+  // Every request but the public files resolves its session. Pages and API are per user from here on.
   app.use(async (c, next) => {
-    const password = c.env.COUCH_PASSWORD;
-    if (!password) return c.text(`${APP_NAME} is locked: set the COUCH_PASSWORD secret (npx wrangler secret put COUCH_PASSWORD).`, 503);
     const url = new URL(c.req.url);
-    if (url.pathname === "/login") return login(c.req.raw, url, password);
-    if (url.pathname === "/remote.webmanifest") return Response.json(REMOTE_MANIFEST, { headers: { "content-type": "application/manifest+json" } });
-    if (PUBLIC.has(url.pathname)) return c.env.ASSETS.fetch(c.req.raw);
-    if (!(await sessionValid(readCookie(c.req.header("cookie") ?? null), password))) {
-      if (url.pathname === "/ws" || url.pathname.startsWith("/api/")) return json("Unauthorized", 401);
-      return c.redirect(`/login?next=${encodeURIComponent(url.pathname + url.search)}`, 303);
+    const path = url.pathname;
+    if (path === "/remote.webmanifest") return Response.json(REMOTE_MANIFEST, { headers: { "content-type": "application/manifest+json" } });
+    if (PUBLIC.has(path)) return c.env.ASSETS.fetch(c.req.raw);
+
+    const d = deps(c.env);
+    const user = await d.accounts.session(readCookie(c.req.header("cookie") ?? null));
+    const open = await publicRoute(c.req.raw, url, d, user);
+    if (open) return open;
+
+    if (!user) {
+      if (path === "/ws" || path.startsWith("/api/")) return json("Unauthorized", 401);
+      if (isPhone(c.req.header("user-agent")) || isRemotePath(path)) return c.redirect(`/login?next=${encodeURIComponent(path + url.search)}`, 303);
+      return c.redirect("/pair", 303);
     }
+
+    const account = await accountRoute(c.req.raw, url, d, user);
+    if (account) return account;
+
+    // A phone session belongs on /remote and a TV session off it. Only page loads move; the bundle and API serve both.
+    if (c.req.method === "GET" && c.req.header("accept")?.includes("text/html")) {
+      if (user.role === "remote" && !isRemotePath(path)) return c.redirect("/remote", 303);
+      if (user.role === "tv" && isRemotePath(path)) return c.redirect("/", 303);
+    }
+    c.set("user", user);
     await next();
   });
 
@@ -63,7 +94,8 @@ export function createApp(tmdbFetch?: typeof globalThis.fetch) {
     if (c.req.header("upgrade") !== "websocket") return c.text("WebSocket upgrade required", 426);
     const origin = c.req.header("origin");
     if (origin && new URL(origin).host !== new URL(c.req.url).host) return c.text("Forbidden", 403);
-    return c.env.RELAY.getByName("couch").fetch(c.req.raw);
+    const user = c.get("user");
+    return c.env.RELAY.getByName(String(user.id)).fetch(new Request(`https://relay/ws?role=${user.role}`, c.req.raw));
   });
 
   app.use("/api/*", async (c, next) => {
@@ -71,10 +103,12 @@ export function createApp(tmdbFetch?: typeof globalThis.fetch) {
     await next();
   });
 
-  app.all("/api/collection/*", async (c) => collectionRoutes(c.env.DB, createTmdb(c.env.TMDB_API_KEY!, tmdbFetch)).fetch(c.req.raw));
-  app.all("/api/collection", async (c) => collectionRoutes(c.env.DB, createTmdb(c.env.TMDB_API_KEY!, tmdbFetch)).fetch(c.req.raw));
+  const lists = (c: { env: Env; get(k: "user"): User; req: { raw: Request } }) =>
+    collectionRoutes(c.env.DB, c.get("user").id, createTmdb(c.env.TMDB_API_KEY!, tmdbFetch)).fetch(c.req.raw);
+  app.all("/api/collection/*", lists);
+  app.all("/api/collection", lists);
 
-  app.all("/api/*", (c) => createApi({ apiKey: c.env.TMDB_API_KEY!, fetch: tmdbFetch, progress: createProgressStore(c.env.DB) })(c.req.raw));
+  app.all("/api/*", (c) => createApi({ apiKey: c.env.TMDB_API_KEY!, fetch: tmdbFetch, progress: createProgressStore(c.env.DB, c.get("user").id) })(c.req.raw));
 
   app.all("*", (c) => c.env.ASSETS.fetch(c.req.raw));
 

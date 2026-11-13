@@ -4,31 +4,34 @@ import { parseNowPlaying, parseRemoteCommand, type NowPlaying, type RemoteComman
 
 export type Role = "tv" | "remote";
 
-/** Client → server. `hello` comes first and fixes the role; the rest are checked against it. */
+/**
+ * Close codes the relay uses when it ends a socket on purpose. The client doesn't reconnect after these.
+ * `replaced`: the same account connected another TV (or phone). `signedOut`: the TV was unpaired.
+ */
+export const CLOSE = { replaced: 4001, signedOut: 4002 } as const;
+
+/** Client → server. The role (TV or phone) comes from the session cookie, not from the client. */
 export type ClientMessage =
-  | { type: "hello"; role: Role }
-  /** TV: "I'm the screen in use" (focus, visibility, navigation). Any other TV message counts as activity too. */
-  | { type: "active" }
-  /** Remote: send the most recently active TV to this title/episode. Relayed unchanged. */
+  /** Remote: send the account's TV to this title/episode. Relayed unchanged. */
   | { type: "play"; target: Target }
-  /** Remote: playback command for the most recently active TV. Relayed unchanged. */
+  /** Remote: playback command for the account's TV. Relayed unchanged. */
   | { type: "command"; command: RemoteCommand }
-  /** TV: what is playing now (`null` = idle). Relayed to every remote and cached for ones that join later. */
+  /** TV: what is playing now (`null` = idle). Relayed to the phone and cached for when it joins later. */
   | { type: "state"; state: NowPlaying | null };
 
 /** Server → client. */
 export type ServerMessage =
-  /** To remotes: is any TV screen open? Sent on join and whenever a TV joins or leaves. */
+  /** To the phone: is the TV open? Sent on join and whenever the TV joins or leaves. */
   | { type: "presence"; tv: boolean }
-  /** To TVs: how many phone remotes are connected. Sent on join and whenever a remote joins or leaves. */
+  /** To the TV: whether its phone is connected (0 or 1). Sent on join and whenever the phone joins or leaves. */
   | { type: "remotes"; count: number }
-  /** To the target TV: navigate to the player for this title/episode. */
+  /** To the TV: navigate to the player for this title/episode. */
   | { type: "play"; target: Target }
-  /** To the target TV: run this playback command. */
+  /** To the TV: run this playback command. */
   | { type: "command"; command: RemoteCommand }
-  /** To the target TV when a remote joins: ask the player for its status and send fresh state. */
+  /** To the TV when the phone joins: ask the player for its status and send fresh state. */
   | { type: "sync" }
-  /** To remotes: the TV's now-playing state, or null when idle. */
+  /** To the phone: the TV's now-playing state, or null when idle. */
   | { type: "state"; state: NowPlaying | null };
 
 const isId = (v: unknown) => typeof v === "string" ? /^\d+$/.test(v) : Number.isInteger(v) && (v as number) > 0;
@@ -50,8 +53,6 @@ export function parseClientMessage(raw: string): ClientMessage | null {
   } catch {
     return null;
   }
-  if (m?.type === "hello" && (m.role === "tv" || m.role === "remote")) return { type: "hello", role: m.role };
-  if (m?.type === "active") return { type: "active" };
   if (m?.type === "play") {
     const target = parseTarget(m.target);
     return target && { type: "play", target };

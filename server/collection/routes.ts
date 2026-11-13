@@ -41,9 +41,9 @@ async function body(req: Request): Promise<Record<string, unknown>> {
   }
 }
 
-/** Mounted at /api/collection; call `.fetch` with the full request. */
-export function collectionRoutes(db: D1Like, tmdb: Tmdb, now?: () => number) {
-  const collection = createCollection(db, tmdbLookup(tmdb), now);
+/** `userId`'s lists, mounted at /api/collection; call `.fetch` with the full request. */
+export function collectionRoutes(db: D1Like, userId: number, tmdb: Tmdb, now?: () => number) {
+  const collection = createCollection(db, userId, tmdbLookup(tmdb), now);
   const notFound = () => fail("Not found", 404);
 
   return new Hono()

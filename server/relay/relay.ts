@@ -1,86 +1,86 @@
-// Phone ↔ TV registry and relay. Pure: knows nothing about sockets, only clients that can be sent messages.
+// One account's TV ↔ phone relay: one TV slot and one phone slot. A new connection in a slot replaces (and closes) the old one.
+// Pure: knows nothing about sockets, only clients that can be sent messages and closed.
 import type { NowPlaying } from "../../shared/playback";
-import type { ClientMessage, Role, ServerMessage } from "../../shared/protocol";
+import { CLOSE, type ClientMessage, type Role, type ServerMessage } from "../../shared/protocol";
 
-export type Client = { send(msg: ServerMessage): void };
+export type Client = { send(msg: ServerMessage): void; close(code: number): void };
 
 /** What a client's registration amounts to, so a relay can be rebuilt after the process holding it went away (Durable Object hibernation). */
-export type Membership = { role: "tv"; clock: number; playing?: NowPlaying } | { role: "remote" };
+export type Membership = { role: "tv"; playing?: NowPlaying } | { role: "remote" };
 
 export function createRelay() {
-  const tvs = new Map<Client, number>(); // client → when it was last active (logical clock, so ties can't happen)
-  const remotes = new Set<Client>();
-  let clock = 0;
-  let latest: { tv: Client; state: NowPlaying } | undefined; // what the last TV to report is playing; absent = idle
+  let tv: Client | undefined;
+  let remote: Client | undefined;
+  let playing: NowPlaying | undefined; // what the TV last said it is playing; absent = idle
 
-  const presence = (): ServerMessage => ({ type: "presence", tv: tvs.size > 0 });
-  const tellRemotes = () => remotes.forEach((r) => r.send(presence()));
-  const remoteCount = (): ServerMessage => ({ type: "remotes", count: remotes.size });
-  const tellTvs = () => tvs.forEach((_, t) => t.send(remoteCount()));
-  const touch = (c: Client) => tvs.has(c) && tvs.set(c, ++clock);
-  /** The most recently active TV. */
-  const target = () => [...tvs].reduce<[Client, number] | undefined>((best, e) => (!best || e[1] > best[1] ? e : best), undefined)?.[0];
+  const idle = () => {
+    if (!playing) return;
+    playing = undefined;
+    remote?.send({ type: "state", state: null });
+  };
 
-  function join(c: Client, role: Role) {
-    if (tvs.has(c) || remotes.has(c)) return; // role is fixed for the life of the connection
-    if (role === "tv") {
-      tvs.set(c, ++clock);
-      c.send(remoteCount());
-      tellRemotes();
-    } else {
-      remotes.add(c);
-      tellTvs();
-      c.send(presence());
-      if (latest) c.send({ type: "state", state: latest.state });
-      target()?.send({ type: "sync" }); // so the player is asked for its status and the phone gets the real state
+  function leave(c: Client) {
+    if (c === remote) {
+      remote = undefined;
+      tv?.send({ type: "remotes", count: 0 });
+    }
+    if (c === tv) {
+      tv = undefined;
+      remote?.send({ type: "presence", tv: false });
+      idle();
     }
   }
 
   return {
-    join,
-    /** `c`'s registration, or undefined if it hasn't said hello. `playing` is set when `c` is the TV the remotes are being shown. */
+    /** `c` connected as `role` (from its session). Whoever held that slot is closed. */
+    join(c: Client, role: Role) {
+      if (c === tv || c === remote) return;
+      if (role === "tv") {
+        tv?.close(CLOSE.replaced);
+        tv = c;
+        idle();
+        c.send({ type: "remotes", count: remote ? 1 : 0 });
+        remote?.send({ type: "presence", tv: true });
+      } else {
+        remote?.close(CLOSE.replaced);
+        remote = c;
+        tv?.send({ type: "remotes", count: 1 });
+        c.send({ type: "presence", tv: !!tv });
+        if (playing) c.send({ type: "state", state: playing });
+        tv?.send({ type: "sync" }); // so the player is asked for its status and the phone gets the real state
+      }
+    },
+    /** `c`'s registration, or undefined if it holds no slot. */
     dump(c: Client): Membership | undefined {
-      const clock = tvs.get(c);
-      if (clock !== undefined) return { role: "tv", clock, ...(latest?.tv === c && { playing: latest.state }) };
-      return remotes.has(c) ? { role: "remote" } : undefined;
+      if (c === tv) return { role: "tv", ...(playing && { playing }) };
+      if (c === remote) return { role: "remote" };
     },
     /** Re-register `c` from a dump. Sends nothing: everyone it would tell is already connected and has been told. */
     load(c: Client, m: Membership) {
-      if (m.role === "remote") return void remotes.add(c);
-      tvs.set(c, m.clock);
-      clock = Math.max(clock, m.clock);
-      if (m.playing) latest = { tv: c, state: m.playing };
+      if (m.role === "remote") return void (remote = c);
+      tv = c;
+      playing = m.playing;
     },
-    /** Handle one message from `c`. Messages from a client in the wrong role (or before `hello`) are dropped. */
+    /** Handle one message from `c`. Messages from a client in the wrong role (or without a slot) are dropped. */
     receive(c: Client, m: ClientMessage) {
-      if (m.type === "hello") return join(c, m.role);
-      if (tvs.has(c)) {
-        touch(c); // `active`, and anything else a TV says, is activity
+      if (c === tv) {
         if (m.type === "state") {
-          if (m.state) latest = { tv: c, state: m.state };
-          else if (latest && latest.tv !== c) return; // an idle TV doesn't hide what another one is playing
-          else latest = undefined;
-          remotes.forEach((r) => r.send(m));
+          playing = m.state ?? undefined;
+          remote?.send(m);
         }
         return;
       }
-      if (!remotes.has(c)) return;
-      if (m.type === "play" || m.type === "command") {
-        // Playback commands belong to the TV whose state the phone is showing; casting goes to the one in use.
-        const tv = m.type === "command" && latest ? latest.tv : target();
-        if (tv) tv.send(m);
-        else c.send(presence()); // the phone's idea of "a TV is open" is stale; correct it
-      }
+      if (c !== remote || (m.type !== "play" && m.type !== "command")) return;
+      if (tv) tv.send(m);
+      else c.send({ type: "presence", tv: false }); // the phone's idea of "the TV is open" is stale; correct it
     },
-    leave(c: Client) {
-      if (remotes.delete(c)) tellTvs();
-      if (tvs.delete(c)) {
-        tellRemotes();
-        if (latest?.tv === c) {
-          latest = undefined;
-          remotes.forEach((r) => r.send({ type: "state", state: null }));
-        }
-      }
+    leave,
+    /** Close the slot's client on purpose (signed out elsewhere). */
+    kick(role: Role, code: number) {
+      const c = role === "tv" ? tv : remote;
+      if (!c) return;
+      leave(c);
+      c.close(code);
     },
   };
 }

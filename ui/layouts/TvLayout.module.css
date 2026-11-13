@@ -39,6 +39,20 @@
   background: var(--veil-soft);
 }
 
+/* Opens Settings: the signed-in account's initial. */
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 /* Title pages: Back only (designs: TV · Title). */
 .back {
   display: flex;

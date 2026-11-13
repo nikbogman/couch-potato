@@ -26,9 +26,15 @@ export function NowPlaying() {
     return (
       <div className={styles.page}>
         {head}
-        <p className={styles.idle}>
-          Nothing is playing on the TV. <Link to="/remote">Pick something to watch</Link>
-        </p>
+        {remote.tv ? (
+          <p className={styles.idle}>
+            Nothing is playing on the TV. <Link to="/remote">Pick something to watch</Link>
+          </p>
+        ) : (
+          <p className={styles.idle}>
+            Your TV isn&rsquo;t on. Open couch potato on it, or <Link to="/remote/pair">pair a TV</Link>.
+          </p>
+        )}
       </div>
     );
   const { command } = remote;

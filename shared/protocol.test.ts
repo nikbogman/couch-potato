@@ -4,8 +4,6 @@ import { parseClientMessage, parseServerMessage, watchPath } from "./protocol";
 const parse = (m: unknown) => parseClientMessage(JSON.stringify(m));
 
 test("accepts well-formed client messages", () => {
-  expect(parse({ type: "hello", role: "tv" })).toEqual({ type: "hello", role: "tv" });
-  expect(parse({ type: "active" })).toEqual({ type: "active" });
   expect(parse({ type: "play", target: { mediaType: "movie", id: 550 } })).toEqual({ type: "play", target: { mediaType: "movie", id: 550 } });
   expect(parse({ type: "play", target: { mediaType: "tv", id: "1399", season: 0, episode: 3, extra: 1 } })).toEqual({
     type: "play",
@@ -18,7 +16,8 @@ test("rejects malformed messages", () => {
   for (const m of [
     null,
     {},
-    { type: "hello", role: "admin" },
+    { type: "hello", role: "tv" }, // the role comes from the session, not the client
+    { type: "active" },
     { type: "play" },
     { type: "play", target: { mediaType: "movie", id: "../x" } },
     { type: "play", target: { mediaType: "tv", id: 1, season: 1 } },

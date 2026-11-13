@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useSyncExternalStore } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { watchPath, type ServerMessage } from "../../shared/protocol";
+import { InUseElsewhere, useKicked } from "./Kicked";
 import { connectSocket, type Socket } from "./socket";
 import { tvBridge } from "./tvBridge";
 
@@ -16,7 +17,7 @@ const subscribe = (l: () => void) => (listeners.add(l), () => void listeners.del
 export const usePhoneConnected = () => useSyncExternalStore(subscribe, () => remotes > 0);
 
 /**
- * Makes every non-remote screen a "tv" client. Mounted once above the routes so the socket survives
+ * Makes every non-remote screen the account's TV client (the session says it's a TV). Mounted once above the routes so the socket survives
  * TvLayout ↔ Player navigation. It sends the TV to the player when a phone asks, hands playback commands to the mounted player
  * (via `tvBridge`) and reports what is playing, or idle anywhere else.
  */
@@ -25,6 +26,8 @@ export function TvClient() {
   const navigate = useNavigate();
   const socket = useRef<Socket | null>(null);
   const isRemote = pathname === "/remote" || pathname.startsWith("/remote/");
+  const { onKicked, elsewhere } = useKicked("tv");
+  const kicked = useEffectEvent(onKicked);
 
   // A URL change the player didn't make itself is a fresh load, so casting a new title reloads it.
   const onMessage = useEffectEvent((m: ServerMessage) => {
@@ -41,24 +44,18 @@ export function TvClient() {
 
   useEffect(() => {
     if (isRemote) return;
-    const s = (socket.current = connectSocket("tv", onMessage, opened));
+    const s = (socket.current = connectSocket(onMessage, opened, kicked));
     const unsink = tvBridge.setSink((state) => s.send({ type: "state", state }));
-    const active = () => document.visibilityState === "visible" && s.send({ type: "active" });
-    window.addEventListener("focus", active);
-    document.addEventListener("visibilitychange", active);
     return () => {
-      window.removeEventListener("focus", active);
-      document.removeEventListener("visibilitychange", active);
       unsink();
       s.close();
       socket.current = null;
     };
   }, [isRemote]);
 
-  // Navigating is activity: the screen someone is using is the screen to cast to.
+  // Leaving the player: tell the phone the TV is idle.
   useEffect(() => {
-    socket.current?.send({ type: "active" });
     if (!pathname.startsWith("/watch/")) socket.current?.send({ type: "state", state: null });
   }, [pathname]);
-  return null;
+  return elsewhere ? <InUseElsewhere /> : null;
 }

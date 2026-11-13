@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { memoryStore } from "./testDb";
+import { memoryD1, memoryStore } from "./testDb";
 
 const movie = (tmdbId: number) => ({ mediaType: "movie" as const, tmdbId });
 
@@ -100,4 +100,19 @@ test("latest and season progress read a series back", async () => {
   expect(await s.latest(5)).toMatchObject({ season: 1, episode: 2 });
   expect((await s.seasonProgress(5, 1)).map((p) => [p.episode, p.finished])).toEqual([[1, true], [2, false]]);
   expect(await s.seasonProgress(5, 3)).toEqual([]);
+});
+
+test("each user has their own progress and Continue watching", async () => {
+  const db = memoryD1();
+  const mine = memoryStore(undefined, 1, db);
+  const theirs = memoryStore(undefined, 2, db);
+  await mine.save({ mediaType: "movie", tmdbId: 5, position: 10, duration: 100 });
+  await mine.save({ mediaType: "tv", tmdbId: 9, season: 1, episode: 2, position: 10, duration: 100 });
+  expect(await theirs.get({ mediaType: "movie", tmdbId: 5 })).toBeNull();
+  expect(await theirs.continueWatching()).toEqual([]);
+  expect(await theirs.latest(9)).toBeNull();
+  await theirs.save({ mediaType: "movie", tmdbId: 5, position: 50, duration: 100 });
+  expect((await mine.get({ mediaType: "movie", tmdbId: 5 }))!.position).toBe(10);
+  expect(await theirs.hide({ mediaType: "tv", tmdbId: 9 })).toBe(false);
+  expect(await mine.continueWatching()).toHaveLength(2);
 });

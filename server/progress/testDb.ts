@@ -19,4 +19,4 @@ export function memoryD1(): D1Like {
   };
 }
 
-export const memoryStore = (now?: () => number) => createProgressStore(memoryD1(), now);
+export const memoryStore = (now?: () => number, userId = 1, db = memoryD1()) => createProgressStore(db, userId, now);

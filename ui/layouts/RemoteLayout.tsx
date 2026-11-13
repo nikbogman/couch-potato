@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import type { Target } from "../../shared/types";
 import { NowPlayingBar } from "../components/NowPlayingBar";
 import type { NowPlaying, RemoteCommand } from "../../shared/playback";
 import { RemoteContext, type Remote } from "../remote/RemoteContext";
+import { InUseElsewhere, useKicked } from "../remote/Kicked";
 import { connectSocket, type Socket } from "../remote/socket";
 import styles from "./RemoteLayout.module.css";
 
@@ -42,10 +43,11 @@ export function RemoteLayout() {
   const { pathname, key } = useLocation();
   const navigate = useNavigate();
   const home = TABS.some((t) => t.to === pathname.replace(/\/$/, "")); // tab roots have no Back
+  const { onKicked, elsewhere } = useKicked("remote");
+  const kicked = useEffectEvent(onKicked);
 
   useEffect(() => {
     const s = connectSocket(
-      "remote",
       (m) => {
         if (m.type === "presence") {
           setTv(m.tv);
@@ -58,6 +60,7 @@ export function RemoteLayout() {
           setNowPlaying(null);
         }
       },
+      kicked,
     );
     setSocket(s);
     return () => s.close();
@@ -98,6 +101,7 @@ export function RemoteLayout() {
         </main>
         <NowPlayingBar />
         <TabBar />
+        {elsewhere && <InUseElsewhere />}
         {notice && (
           <p className={styles.notice} role="status">
             {notice}

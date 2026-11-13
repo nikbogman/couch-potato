@@ -30,30 +30,39 @@ Everything runs on Cloudflare, within the free tier: one Worker, one D1 database
 
 A single [Hono](https://hono.dev) app handles every request, in this order:
 
-1. **Password gate.** The login page sets a signed session cookie. Without it, pages redirect to `/login`, and the API and WebSocket answer `401`.
-2. **`/ws`.** WebSocket upgrades are handed to the relay Durable Object (same-origin only).
-3. **`/api/collection`.** The lists: read, add, mark watched, favourite.
-4. **`/api/*`.** The TMDB proxy (search, trending, titles, seasons) and watch progress. The TMDB key never leaves the server.
+1. **Accounts.** Every request resolves a session cookie to a user and a role: their **phone** (signed in with name and password at `/login`) or their **TV** (paired at `/pair`). Signed out, phones go to `/login`, everything else to `/pair`, and the API and WebSocket answer `401`. Account endpoints (`/api/me`, pairing, unpair, password, invites) live in `server/auth/`.
+2. **`/ws`.** WebSocket upgrades go to the user's own relay Durable Object, with the role from the session (same-origin only).
+3. **`/api/collection`.** The user's lists: read, add, mark watched, favourite.
+4. **`/api/*`.** The TMDB proxy (search, trending, titles, seasons) and the user's watch progress. The TMDB key never leaves the server.
 5. **Everything else.** Static assets: the React app and its icons.
 
 The handler has no Cloudflare imports, so the whole server runs under `bun test` with in-memory fakes for D1, the assets binding and the relay.
 
+### Accounts and pairing
+
+I made my account with `scripts/owner.ts`; friends join through an invite link I make on my phone (Settings › Invite a friend), and get their own lists, TV and remote. Each account has **one TV and one phone**:
+
+- **Phone:** name and password. Signing in on another phone signs the old one out.
+- **TV:** nothing to type. The TV shows a QR code and a 6-character code; the phone scans it (or types the code) and approves. Pairing another TV signs the old one out; Unpair (on the TV or the phone) sends the TV back to the code.
+
+A session is a random token; the user row keeps only its hash, one for the TV and one for the phone, so replacing a device revokes the old one. Sign-in, pairing and invites are rate limited per IP.
+
 ### The phone-to-TV relay <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
-A single Durable Object holds one "room" in which TVs and phones meet over WebSocket:
+Each account has its own Durable Object, a room with one TV slot and one phone slot. A new connection in a slot closes the old one (close code 4001; 4002 when the TV is unpaired):
 
 | From | Message | Effect |
 |---|---|---|
-| Phone | `play` | The most recently active TV opens the player for that title or episode |
-| Phone | `command` | Play, pause, seek, fullscreen, next episode, switch player or stop on that TV |
-| TV | `state` | What's playing now, sent to every phone and cached for phones that join later |
-| Server | `presence` / `remotes` | Phones learn whether a TV is open; TVs learn how many phones are connected |
+| Phone | `play` | The TV opens the player for that title or episode |
+| Phone | `command` | Play, pause, seek, fullscreen, next episode, switch player or stop on the TV |
+| TV | `state` | What's playing now, sent to the phone and cached for when it joins later |
+| Server | `presence` / `remotes` | The phone learns whether the TV is open; the TV learns whether its phone is connected |
 
 The message types live in `shared/protocol.ts` and are checked on both sides.
 
 ### The database <img src="https://cdn.simpleicons.org/cloudflare/F38020" height="16" alt="">
 
-D1 (SQLite) holds two tables:
+D1 (SQLite) holds the accounts (`users`, `invites`, `pairings`) and, per user:
 
 - **`collection`**: one row per title (`media_type` + `tmdb_id`), with its status, dates and favourite flag. The rules are enforced by the schema itself: a title is watched exactly when it has a watched date, and a favourite must be watched. Title, year and poster are copied from TMDB once, so lists load without calling TMDB.
 - **`progress`**: position and duration per film or episode, updated as I watch.
@@ -75,9 +84,10 @@ Notes for me, or an AI agent, to set it up again. It needs [Bun](https://bun.sh)
 
 ```sh
 bun install
-cp .dev.vars.example .dev.vars   # fill in TMDB_API_KEY and COUCH_PASSWORD
+cp .dev.vars.example .dev.vars   # fill in TMDB_API_KEY
 bun run build
 npx wrangler d1 migrations apply couch-potato --local
+bun scripts/owner.ts <my name>   # my account; asks for a password
 bun run dev                      # serves on the local network, so the phone can reach it
 ```
 
@@ -92,15 +102,15 @@ bun run typecheck
 
 ```sh
 npx wrangler d1 migrations apply couch-potato --remote
-npx wrangler secret put COUCH_PASSWORD
+bun scripts/owner.ts <my name> --remote   # once; again to reset my password
 npx wrangler secret put TMDB_API_KEY
 bun run deploy
 ```
 
-Then I open the Worker's URL on the monitor, sign in, and open the same URL on my phone to get the remote.
+Then I sign in on my phone, open the Worker's URL on the monitor and scan its pairing code. Lists and progress from before accounts belong to my account (user 1).
 
 ## Notes
 
-- Built for one person, me: there are no accounts, just the one password.
+- Built for me and a few friends: accounts are by invite only, and only I can invite.
 - The app doesn't host or store video. Playback comes from third-party embed players, and their availability is outside this app's control.
 - Film and series data comes from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.

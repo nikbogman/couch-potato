@@ -4,12 +4,16 @@ import { RemoteLayout } from "./layouts/RemoteLayout";
 import { TvLayout } from "./layouts/TvLayout";
 import { Navigation } from "./navigation/Navigation";
 import { Home } from "./pages/Home";
+import { Invite } from "./pages/Invite";
 import { Lists } from "./pages/Lists";
 import { Movie } from "./pages/Movie";
 import { NowPlaying } from "./pages/NowPlaying";
+import { PairTv } from "./pages/PairTv";
 import { Player } from "./pages/Player";
 import { Search } from "./pages/Search";
 import { Series } from "./pages/Series";
+import { Settings } from "./pages/Settings";
+import { TvSettings } from "./pages/TvSettings";
 import { TvClient } from "./remote/TvClient";
 
 export function App() {
@@ -26,6 +30,9 @@ export function App() {
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<Movie />} />
           <Route path="tv/:id" element={<Series />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="pair" element={<PairTv />} />
+          <Route path="invite" element={<Invite />} />
           <Route path="*" element={<PageMessage>Page not found.</PageMessage>} />
         </Route>
         <Route element={<TvLayout />}>
@@ -34,6 +41,7 @@ export function App() {
           <Route path="/lists" element={<Lists />} />
           <Route path="/movie/:id" element={<Movie />} />
           <Route path="/tv/:id" element={<Series />} />
+          <Route path="/settings" element={<TvSettings />} />
           <Route path="*" element={<PageMessage>Page not found.</PageMessage>} />
         </Route>
         <Route path="/watch/movie/:id" element={<Player kind="movie" />} />

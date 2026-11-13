@@ -4,11 +4,11 @@ export { Relay } from "./relay";
 
 /** The real bindings (wrangler.jsonc); passing it to `handle` checks they fit the structural `Env` the handler is tested with. */
 interface Bindings {
-  COUCH_PASSWORD?: string;
   TMDB_API_KEY?: string;
   DB: D1Database;
   ASSETS: Fetcher;
   RELAY: DurableObjectNamespace;
+  LIMITER: RateLimit;
 }
 
 export default {

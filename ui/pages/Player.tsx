@@ -17,6 +17,7 @@ import { usePlayerProgress } from "../player/usePlayerProgress";
 import { setPreferredPlayer } from "../player/preferred";
 import { PageMessage } from "../components/Status";
 import styles from "./Player.module.css";
+import { WEBOS_BACK } from "../navigation/Navigation";
 
 /** The toast for a phone command, or null for ones that show for themselves (switch, stop, next, volume). */
 export function phoneToast(cmd: RemoteCommand, playingAfter: boolean): string | null {
@@ -270,8 +271,9 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     }
   });
   const onKey = useEffectEvent((e: KeyboardEvent) => {
-    if ((e.key === "Escape" || e.key === "Backspace") && full) toggleFull(); // fullscreen first, as browsers do with Esc
-    else if (e.key === "Escape" || e.key === "Backspace") back();
+    const backKey = e.key === "Escape" || e.key === "Backspace" || e.keyCode === WEBOS_BACK;
+    if (backKey && full) toggleFull(); // fullscreen first, as browsers do with Esc
+    else if (backKey) back();
     else if ((e.key === "f" || e.key === "F") && !inBar()) toggleFull();
   });
   useEffect(() => {

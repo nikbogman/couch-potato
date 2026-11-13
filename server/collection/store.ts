@@ -36,24 +36,24 @@ const toItem = (r: Row): ListItem => ({
 const toWatch = (now: number): Entry => ({ status: "to_watch", addedAt: now, watchedAt: null, favourite: false });
 const watched = (current: Entry | undefined, now: number, favourite = false): Entry => ({ status: "watched", addedAt: current?.addedAt ?? now, watchedAt: now, favourite });
 
-/** `lookup` fetches a title from TMDB the first time it's added (null: TMDB doesn't know it). `now` is injectable for tests. */
-export function createCollection(db: D1Like, lookup: (k: Key) => Promise<TitleInfo | null>, now: () => number = Date.now) {
-  const KEY = "media_type = ?1 and tmdb_id = ?2";
+/** `userId`'s lists. `lookup` fetches a title from TMDB the first time it's added (null: TMDB doesn't know it). `now` is injectable for tests. */
+export function createCollection(db: D1Like, userId: number, lookup: (k: Key) => Promise<TitleInfo | null>, now: () => number = Date.now) {
+  const KEY = "user_id = ?1 and media_type = ?2 and tmdb_id = ?3";
 
   async function find(k: Key) {
-    const r = await db.prepare(`select * from collection where ${KEY}`).bind(k.mediaType, k.tmdbId).first<Row>();
+    const r = await db.prepare(`select * from collection where ${KEY}`).bind(userId, k.mediaType, k.tmdbId).first<Row>();
     return r ? toEntry(r) : undefined;
   }
 
   async function drop(k: Key) {
-    await db.prepare(`delete from collection where ${KEY}`).bind(k.mediaType, k.tmdbId).run();
+    await db.prepare(`delete from collection where ${KEY}`).bind(userId, k.mediaType, k.tmdbId).run();
     return view(null);
   }
 
   async function update(k: Key, e: Entry) {
     await db
-      .prepare(`update collection set status = ?3, added_at = ?4, watched_at = ?5, favourite = ?6 where ${KEY}`)
-      .bind(k.mediaType, k.tmdbId, e.status, e.addedAt, e.watchedAt, e.favourite ? 1 : 0)
+      .prepare(`update collection set status = ?4, added_at = ?5, watched_at = ?6, favourite = ?7 where ${KEY}`)
+      .bind(userId, k.mediaType, k.tmdbId, e.status, e.addedAt, e.watchedAt, e.favourite ? 1 : 0)
       .run();
     return view(e);
   }
@@ -63,9 +63,9 @@ export function createCollection(db: D1Like, lookup: (k: Key) => Promise<TitleIn
     const info = await lookup(k);
     if (!info) return null;
     await db
-      .prepare(`insert into collection (media_type, tmdb_id, title, year, poster_path, status, added_at, watched_at, favourite)
-        values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`)
-      .bind(k.mediaType, k.tmdbId, info.title, info.year, info.posterPath, e.status, e.addedAt, e.watchedAt, e.favourite ? 1 : 0)
+      .prepare(`insert into collection (user_id, media_type, tmdb_id, title, year, poster_path, status, added_at, watched_at, favourite)
+        values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`)
+      .bind(userId, k.mediaType, k.tmdbId, info.title, info.year, info.posterPath, e.status, e.addedAt, e.watchedAt, e.favourite ? 1 : 0)
       .run();
     return view(e);
   }
@@ -97,7 +97,7 @@ export function createCollection(db: D1Like, lookup: (k: Key) => Promise<TitleIn
      * `total` counts the whole list, `matching` only titles containing `title`.
      */
     async list(list: List, { title = "", oldestFirst = false, offset = 0 }: { title?: string; oldestFirst?: boolean; offset?: number } = {}) {
-      const where = list === "favourites" ? "favourite = 1" : `status = '${list}'`;
+      const where = `user_id = ?3 and ${list === "favourites" ? "favourite = 1" : `status = '${list}'`}`;
       const date = list === "to_watch" ? "added_at" : "watched_at";
       const dir = oldestFirst ? "asc" : "desc";
       const pattern = `%${title.replace(/[\\%_]/g, "\\$&")}%`;
@@ -105,10 +105,10 @@ export function createCollection(db: D1Like, lookup: (k: Key) => Promise<TitleIn
       const [{ results }, total, matching] = await Promise.all([
         db
           .prepare(`select * from collection where ${search} order by ${date} ${dir}, media_type ${dir}, tmdb_id ${dir} limit ${PAGE_SIZE} offset ?2`)
-          .bind(pattern, offset)
+          .bind(pattern, offset, userId)
           .all<Row>(),
-        db.prepare(`select count(*) as n from collection where ${where}`).bind().first<{ n: number }>(),
-        db.prepare(`select count(*) as n from collection where ${search}`).bind(pattern).first<{ n: number }>(),
+        db.prepare(`select count(*) as n from collection where ${where}`).bind(null, null, userId).first<{ n: number }>(),
+        db.prepare(`select count(*) as n from collection where ${search}`).bind(pattern, null, userId).first<{ n: number }>(),
       ]);
       const next = offset + results.length;
       const m = matching?.n ?? 0;

@@ -1,4 +1,4 @@
-import { parseServerMessage, type ClientMessage, type Role, type ServerMessage } from "../../shared/protocol";
+import { CLOSE, parseServerMessage, type ClientMessage, type ServerMessage } from "../../shared/protocol";
 
 export const backoff = (attempt: number) => Math.min(10_000, 500 * 2 ** attempt);
 
@@ -9,16 +9,20 @@ const wsUrl = () => `${location.protocol === "https:" ? "wss" : "ws"}://${locati
 
 export type Socket = { send(m: ClientMessage): void; close(): void };
 
+/** Why the server ended the socket on purpose: another device took this one's place, or the TV was unpaired. */
+export type Kicked = "replaced" | "signedOut";
+
 /**
- * A WebSocket to the server that announces `role` on every (re)connect and reconnects with backoff when it drops.
+ * A WebSocket to the server (the session cookie says whether this is the TV or the phone) that reconnects with backoff when it drops.
+ * When the server ends it on purpose (`CLOSE`), it stays closed and `onKicked` says why.
  * `onOpen(false)` fires while it's down, so a phone doesn't claim a TV it can no longer hear about.
  * Leaving the page drops the socket even when the browser keeps the page in its back/forward cache, where it would
  * otherwise stay connected: a TV that has moved on to another site would still count as open and still get casts.
  */
 export function connectSocket(
-  role: Role,
   onMessage: (m: ServerMessage) => void,
   onOpen: (open: boolean) => void = () => {},
+  onKicked: (why: Kicked) => void = () => {},
   // seams for tests
   dial: (url: string) => WebSocket = (u) => new WebSocket(u),
   later: (fn: () => void, ms: number) => ReturnType<typeof setTimeout> = setTimeout,
@@ -54,7 +58,6 @@ export function connectSocket(
     const sock = (ws = dial(wsUrl()));
     sock.onopen = () => {
       attempt = 0;
-      sock.send(JSON.stringify({ type: "hello", role } satisfies ClientMessage));
       onOpen(true);
       beat = heartbeat(ping, PING_EVERY_MS);
     };
@@ -68,11 +71,13 @@ export function connectSocket(
       const m = typeof e.data === "string" ? parseServerMessage(e.data) : null;
       if (m) onMessage(m);
     };
-    sock.onclose = () => {
+    sock.onclose = (e) => {
       if (closed) return;
       clearTimeout(beat);
       clearTimeout(dead);
       onOpen(false);
+      const why = e?.code === CLOSE.replaced ? "replaced" : e?.code === CLOSE.signedOut ? "signedOut" : null;
+      if (why) return void ((closed = true), onKicked(why));
       timer = later(start, backoff(attempt++));
     };
   };

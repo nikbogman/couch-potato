@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { handle, type Env } from "../handler";
+import { signedIn } from "../auth/testAuth";
 import { memoryD1 } from "../progress/testDb";
 import { createCollection, PAGE_SIZE, type Key, type Status } from "./store";
 
@@ -18,18 +19,12 @@ const tmdb = (async (url: string) => {
 
 async function app() {
   const env: Env = {
-    COUCH_PASSWORD: "pw",
     TMDB_API_KEY: "KEY",
     DB: memoryD1(),
     ASSETS: { fetch: async () => new Response("shell") },
     RELAY: { getByName: () => ({ fetch: async () => new Response("relay") }) },
   };
-  const login = await handle(
-    new Request("https://x.test/login", { method: "POST", body: new URLSearchParams({ password: "pw", next: "/" }), headers: { "content-type": "application/x-www-form-urlencoded" } }),
-    env,
-    tmdb,
-  );
-  const cookie = login.headers.get("set-cookie")!.split(";")[0]!;
+  const cookie = await signedIn(env.DB);
   const call = (path: string, init: RequestInit = {}, auth = cookie) =>
     handle(new Request(`https://x.test${path}`, { ...init, headers: { cookie: auth, "content-type": "application/json", ...init.headers } }), env, tmdb);
   const put = (path: string, body: unknown) => call(path, { method: "PUT", body: JSON.stringify(body) });
@@ -129,7 +124,7 @@ test("bad input is a 400 or 404, and the collection needs the session", async ()
 // Paging, sorting and search run on the store directly with a fake clock, so ordering is deterministic.
 function store() {
   let t = 0;
-  const c = createCollection(memoryD1(), async ({ tmdbId }) => ({ title: `Title ${tmdbId}${tmdbId % 2 ? " odd_%" : ""}`, year: null, posterPath: null }), () => ++t);
+  const c = createCollection(memoryD1(), 1, async ({ tmdbId }) => ({ title: `Title ${tmdbId}${tmdbId % 2 ? " odd_%" : ""}`, year: null, posterPath: null }), () => ++t);
   return c;
 }
 const movie = (tmdbId: number): Key => ({ mediaType: "movie", tmdbId });
@@ -164,4 +159,19 @@ test("title search is a case-insensitive substring match with % and _ taken lite
   expect(await c.list("watched", { title: "ODD_%" })).toMatchObject({ total: 4, matching: 2 });
   expect((await c.list("watched", { title: "_" })).matching).toBe(2);
   expect((await c.list("watched", { title: "title 4" })).items.map((i) => i.id)).toEqual([4]);
+});
+
+test("each user has their own lists", async () => {
+  const db = memoryD1();
+  const info = async () => ({ title: "Heat", year: null, posterPath: null });
+  const mine = createCollection(db, 1, info);
+  const theirs = createCollection(db, 2, info);
+  await mine.setStatus(movie(3), "watched");
+  await mine.setFavourite(movie(3), true);
+  expect(await theirs.entry(movie(3))).toEqual({ status: null, favourite: false, watchedAt: null });
+  expect(await theirs.list("watched")).toMatchObject({ items: [], total: 0, matching: 0 });
+  await theirs.setStatus(movie(3), "to_watch"); // same title, separate row
+  expect((await mine.entry(movie(3))).status).toBe("watched");
+  await theirs.setStatus(movie(3), null);
+  expect((await mine.list("favourites")).total).toBe(1);
 });

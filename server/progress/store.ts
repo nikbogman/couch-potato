@@ -40,20 +40,20 @@ const toProgress = (r: Row): Progress => ({
   finished: r.position >= r.duration * FINISHED_AT,
 });
 
-/** D1-backed watch progress, one row per movie or episode (schema: migrations/). `now` is injectable for tests. */
-export function createProgressStore(db: D1Like, now: () => number = Date.now) {
-  // ?1 media type, ?2 tmdb id, ?3 season, ?4 episode; null season/episode compare as -1 to match the unique index.
-  const where = "media_type = ?1 and tmdb_id = ?2 and ifnull(season, -1) = ifnull(?3, -1) and ifnull(episode, -1) = ifnull(?4, -1)";
-  const key = (k: ProgressKey) => [k.mediaType, k.tmdbId, k.season ?? null, k.episode ?? null];
+/** `userId`'s watch progress on D1, one row per movie or episode (schema: migrations/). `now` is injectable for tests. */
+export function createProgressStore(db: D1Like, userId: number, now: () => number = Date.now) {
+  // ?1 user, ?2 media type, ?3 tmdb id, ?4 season, ?5 episode; null season/episode compare as -1 to match the unique index.
+  const where = "user_id = ?1 and media_type = ?2 and tmdb_id = ?3 and ifnull(season, -1) = ifnull(?4, -1) and ifnull(episode, -1) = ifnull(?5, -1)";
+  const key = (k: ProgressKey) => [userId, k.mediaType, k.tmdbId, k.season ?? null, k.episode ?? null];
 
   return {
     /** Insert or update. Watching again un-hides the item. Callers validate: duration > 0, position >= 0. */
     async save(k: ProgressKey & { position: number; duration: number }) {
       await db
-        .prepare(`insert into progress (media_type, tmdb_id, season, episode, position, duration, updated_at)
-          values (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-          on conflict (media_type, tmdb_id, ifnull(season, -1), ifnull(episode, -1))
-          do update set position = ?5, duration = ?6, updated_at = ?7, hidden = 0`)
+        .prepare(`insert into progress (user_id, media_type, tmdb_id, season, episode, position, duration, updated_at)
+          values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+          on conflict (user_id, media_type, tmdb_id, ifnull(season, -1), ifnull(episode, -1))
+          do update set position = ?6, duration = ?7, updated_at = ?8, hidden = 0`)
         .bind(...key(k), Math.min(k.position, k.duration), k.duration, now())
         .run();
     },
@@ -69,27 +69,27 @@ export function createProgressStore(db: D1Like, now: () => number = Date.now) {
     async continueWatching(): Promise<Progress[]> {
       const { results } = await db
         .prepare(`select * from progress p
-          where hidden = 0 and (
+          where user_id = ?1 and hidden = 0 and (
             (media_type = 'movie' and position < duration * ${FINISHED_AT})
-            or (media_type = 'tv' and rowid = (select rowid from progress q where q.media_type = 'tv' and q.tmdb_id = p.tmdb_id
+            or (media_type = 'tv' and rowid = (select rowid from progress q where q.user_id = ?1 and q.media_type = 'tv' and q.tmdb_id = p.tmdb_id
               order by updated_at desc, rowid desc limit 1)))
           order by updated_at desc, rowid desc limit ${CANDIDATE_LIMIT}`)
-        .bind()
+        .bind(userId)
         .all<Row>();
       return results.map(toProgress);
     },
     /** The most recently watched episode of a series. */
     async latest(tmdbId: number): Promise<Progress | null> {
       const r = await db
-        .prepare(`select * from progress where media_type = 'tv' and tmdb_id = ?1 order by updated_at desc, rowid desc limit 1`)
-        .bind(tmdbId)
+        .prepare(`select * from progress where user_id = ?1 and media_type = 'tv' and tmdb_id = ?2 order by updated_at desc, rowid desc limit 1`)
+        .bind(userId, tmdbId)
         .first<Row>();
       return r && toProgress(r);
     },
     async seasonProgress(tmdbId: number, season: number): Promise<Progress[]> {
       const { results } = await db
-        .prepare(`select * from progress where media_type = 'tv' and tmdb_id = ?1 and season = ?2 order by episode`)
-        .bind(tmdbId, season)
+        .prepare(`select * from progress where user_id = ?1 and media_type = 'tv' and tmdb_id = ?2 and season = ?3 order by episode`)
+        .bind(userId, tmdbId, season)
         .all<Row>();
       return results.map(toProgress);
     },
@@ -97,7 +97,7 @@ export function createProgressStore(db: D1Like, now: () => number = Date.now) {
     async hide(k: ProgressKey): Promise<boolean> {
       const r =
         k.mediaType === "tv"
-          ? await db.prepare(`update progress set hidden = 1 where media_type = 'tv' and tmdb_id = ?1`).bind(k.tmdbId).run()
+          ? await db.prepare(`update progress set hidden = 1 where user_id = ?1 and media_type = 'tv' and tmdb_id = ?2`).bind(userId, k.tmdbId).run()
           : await db.prepare(`update progress set hidden = 1 where ${where}`).bind(...key(k)).run();
       return r.meta.changes > 0;
     },

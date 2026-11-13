@@ -7,11 +7,13 @@ import { focusAndReveal, focusUnderPointer, isTextEntry, jumpFocus, moveFocus, p
 
 const ARROWS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
 const JUMPS: Record<string, Jump> = { Home: "home", End: "end", PageUp: "pageUp", PageDown: "pageDown" };
+/** The LG (webOS) remote's Back button, which has no `key` name. */
+export const WEBOS_BACK = 461;
 const SETTLE_MS = 4000; // how long after a route change we keep looking for the page's primary element
 
 /**
  * Keyboard and controller browsing for every TV screen: arrows and the d-pad/stick move focus spatially, A activates, B goes back.
- * Home/End/PageUp/PageDown jump along the row or page; Escape/Backspace go back; Delete (pad: Y) removes a Continue watching card.
+ * Home/End/PageUp/PageDown jump along the row or page; Escape/Backspace (and the LG remote's Back) go back; Delete (pad: Y) removes a Continue watching card.
  * The d-pad is turned into arrow keys, so a widget that handles arrows itself (season tabs) wins over the spatial move.
  * The player screen reads the pad itself; here it only gets arrow handling for its top bar. Not applied under /remote.
  */
@@ -45,9 +47,10 @@ export function Navigation() {
       const active = document.activeElement;
       const typing = isTextEntry(active);
       const dialog = document.querySelector<HTMLElement>("dialog[open]");
-      if (dialog instanceof HTMLDialogElement && e.key === "Escape") return void (e.preventDefault(), dialog.close());
+      const backKey = e.key === "Escape" || e.key === "Backspace" || e.keyCode === WEBOS_BACK;
+      if (dialog instanceof HTMLDialogElement && (e.key === "Escape" || e.keyCode === WEBOS_BACK)) return void (e.preventDefault(), dialog.close());
       if (dialog) return void (ARROWS[e.key] && moveFocus(ARROWS[e.key]!, dialog) && e.preventDefault());
-      if (!watching && !typing && (e.key === "Escape" || e.key === "Backspace")) return void (e.preventDefault(), back());
+      if (!watching && !typing && backKey) return void (e.preventDefault(), back());
       const jump = JUMPS[e.key];
       if (jump && !watching && !(typing && (jump === "home" || jump === "end")) && jumpFocus(jump)) return e.preventDefault();
       const d = ARROWS[e.key];

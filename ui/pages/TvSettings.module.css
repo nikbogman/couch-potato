@@ -1,0 +1,169 @@
+/* TV Settings (designs: TV · Settings and unpair). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 1100px;
+  padding: calc(var(--header-h) + var(--space-7)) var(--safe-x) var(--space-9);
+}
+
+.h1 {
+  margin: 0;
+  font-size: var(--text-3xl);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.card,
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 28px var(--space-6);
+}
+
+.card {
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 44px;
+  font-weight: 700;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.name {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.label {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.muted {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.group {
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text-soft);
+}
+
+.group .text {
+  color: var(--text);
+}
+
+.row + .row {
+  border-top: 1px solid var(--surface-2);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.on {
+  background: var(--ok);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.action .muted {
+  max-width: 640px;
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+}
+
+.button {
+  flex: none;
+  height: 72px;
+  padding: 0 36px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--veil);
+  color: var(--text);
+  font: 600 var(--text-md) var(--font-body);
+  cursor: pointer;
+  transition: transform 150ms ease-out;
+}
+
+.primary {
+  background: var(--text);
+  color: var(--ink);
+}
+
+.button:focus-visible,
+.button:focus {
+  outline: none;
+  box-shadow: var(--ring);
+  transform: scale(1.04);
+}
+
+.dialog {
+  width: 760px;
+  padding: var(--space-7);
+  border: 0;
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+.dialog h2 {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-2xl);
+  letter-spacing: -0.02em;
+}
+
+.dialog p {
+  margin: 0 0 var(--space-6);
+  color: var(--text-soft);
+  line-height: var(--leading-relaxed);
+}
+
+.buttons {
+  display: flex;
+  gap: var(--space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

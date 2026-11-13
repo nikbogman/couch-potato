@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { APP_NAME, BrandMark } from "../components/Brand";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { ControllerHelp } from "../components/ControllerHelp";
+import { fetchMe } from "../lib/account";
 import styles from "./TvLayout.module.css";
 
 const pill = ({ isActive }: { isActive: boolean }) => `${styles.pill} ${isActive ? styles.active : ""}`;
@@ -23,6 +25,7 @@ const isTitlePage = (path: string) => /^\/(movie|tv)\//.test(path);
 
 export function TvLayout() {
   const scrolled = useScrolled();
+  const me = useQuery({ queryKey: ["me"], queryFn: fetchMe });
   const { pathname } = useLocation();
   const navigate = useNavigate();
   if (isTitlePage(pathname))
@@ -69,6 +72,9 @@ export function TvLayout() {
             </svg>
           </Link>
           <ControllerHelp />
+          <NavLink to="/settings" className={styles.avatar} aria-label={me.data ? `Settings, signed in as ${me.data.name}` : "Settings"}>
+            {me.data?.name[0]?.toUpperCase()}
+          </NavLink>
         </div>
       </header>
       <main>
