@@ -10,3 +10,4 @@ dist/
 .design/
 data/
 .shots/
+backup*.sql
