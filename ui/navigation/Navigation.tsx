@@ -9,11 +9,15 @@ const ARROWS: Record<string, Dir> = { ArrowUp: "up", ArrowDown: "down", ArrowLef
 const JUMPS: Record<string, Jump> = { Home: "home", End: "end", PageUp: "pageUp", PageDown: "pageDown" };
 /** The LG (webOS) remote's Back button, which has no `key` name. */
 export const WEBOS_BACK = 461;
+/** The header's tabs, in order: the bumpers step through them. */
+const TABS = ["/", "/search", "/lists"];
 const SETTLE_MS = 4000; // how long after a route change we keep looking for the page's primary element
 
 /**
- * Keyboard and controller browsing for every TV screen: arrows and the d-pad/stick move focus spatially, A activates, B goes back.
- * Home/End/PageUp/PageDown jump along the row or page; Escape/Backspace (and the LG remote's Back) go back; Delete (pad: Y) removes a Continue watching card.
+ * Keyboard and controller browsing for every TV screen, with the buttons console streaming apps use:
+ * arrows and the d-pad/stick move focus spatially, A (✕) activates, B (○) goes back, Y (△) or "/" opens Search,
+ * X (□) or Delete removes a Continue watching card, LB/RB (L1/R1) step through the header tabs, LT/RT (L2/R2) or PageUp/PageDown jump a page,
+ * Home/End jump along the row; Escape/Backspace (and the LG remote's Back) go back. Menu (OPTIONS) opens Controls.
  * The d-pad is turned into arrow keys, so a widget that handles arrows itself (season tabs) wins over the spatial move.
  * The player screen reads the pad itself; here it only gets arrow handling for its top bar. Not applied under /remote.
  */
@@ -51,6 +55,7 @@ export function Navigation() {
       if (dialog instanceof HTMLDialogElement && (e.key === "Escape" || e.keyCode === WEBOS_BACK)) return void (e.preventDefault(), dialog.close());
       if (dialog) return void (ARROWS[e.key] && moveFocus(ARROWS[e.key]!, dialog) && e.preventDefault());
       if (!watching && !typing && backKey) return void (e.preventDefault(), back());
+      if (!watching && !typing && e.key === "/") return void (e.preventDefault(), navigate("/search"));
       const jump = JUMPS[e.key];
       if (jump && !watching && !(typing && (jump === "home" || jump === "end")) && jumpFocus(jump)) return e.preventDefault();
       const d = ARROWS[e.key];
@@ -92,7 +97,15 @@ export function Navigation() {
     if (a === "b") return dialog ? dialog.close() : back();
     if (a === "menu") return void dispatchEvent(new Event(HELP_EVENT));
     const el = document.activeElement;
-    if (a === "y") return void el?.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true, cancelable: true }));
+    if (dialog) return void (a === "a" && el instanceof HTMLElement && el.click()); // the open dialog handles everything else (Controls: LB/RB)
+    if (a === "y") return void navigate("/search");
+    if (a === "x") return void el?.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true, cancelable: true }));
+    if (a === "lt" || a === "rt") return void jumpFocus(a === "lt" ? "pageUp" : "pageDown");
+    if (a === "lb" || a === "rb") {
+      const i = TABS.indexOf(pathname); // only on a tab page: a series page uses the bumpers for its seasons
+      const to = i < 0 ? undefined : TABS[i + (a === "rb" ? 1 : -1)];
+      return void (to && navigate(to));
+    }
     if (a !== "a") return;
     if (!(el instanceof HTMLElement) || el === document.body) return void restoreFocus(false);
     el.click();

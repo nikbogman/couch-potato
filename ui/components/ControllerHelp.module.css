@@ -1,19 +1,30 @@
+/* Header devices button + tooltip, and the Controls sheet (designs: TV · Devices button and tooltip, TV · Controls sheet). */
+.anchor {
+  position: relative;
+  display: flex;
+}
+
 .chip {
   display: flex;
   align-items: center;
+  gap: 14px;
   height: 56px;
-  padding: 0 18px;
+  padding: 0 20px;
   border: 0;
   border-radius: var(--radius-full);
   background: var(--veil-soft);
   color: var(--muted);
-  font-size: var(--text-sm);
-  font-weight: 500;
   cursor: pointer;
+  transition: transform 180ms ease-out, background-color 180ms ease-out;
 }
 
-.chip:hover {
+.chip:hover,
+.chip:focus-visible {
   background: var(--veil);
+}
+
+.chip:focus-visible {
+  transform: scale(1.04);
 }
 
 /* Green: that device is connected. */
@@ -21,94 +32,274 @@
   color: var(--ok);
 }
 
-.dialog {
-  width: min(1200px, calc(100vw - 2 * var(--safe-x)));
-  max-height: calc(100dvh - var(--space-9));
-  padding: var(--space-7) var(--space-8);
-  border: 0;
+/* Under the button, right-aligned to it; shown while it is hovered or focused. */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 20px);
+  right: -60px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 460px;
+  padding: 24px 28px;
   border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  box-shadow: 0 24px 48px rgb(0 0 0 / 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 150ms ease-out, transform 150ms ease-out, visibility 150ms;
+  pointer-events: none;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 100px;
+  width: 20px;
+  height: 20px;
+  background: var(--surface-2);
+  transform: rotate(45deg);
+}
+
+.chip:hover + .tooltip,
+.chip:focus-visible + .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.tipRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: #5a5d64;
+}
+
+.dotOn {
+  background: var(--ok);
+}
+
+.tipText,
+.deviceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tipText strong {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.tipText span {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+/* The sheet: slides in from the right over the dimmed page. */
+.sheet {
+  box-sizing: border-box;
+  width: 820px;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: none;
+  margin: 0 0 0 auto;
+  padding: 56px 72px 44px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  border: 0;
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 32px 80px rgb(0 0 0 / 0.7);
+  box-shadow: -32px 0 80px rgb(0 0 0 / 0.5);
+  flex-direction: column;
+  gap: 28px;
 }
 
-.dialog::backdrop {
-  background: var(--scrim);
-}
-
-.head {
+.sheet[open] {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-5);
-  margin-bottom: var(--space-6);
+  animation: slide 200ms ease-out;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+.sheet::backdrop {
+  background: rgb(11 12 14 / 0.72);
 }
 
 .h2 {
+  margin: 0;
   font-size: var(--text-2xl);
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.status {
-  color: var(--muted);
-  font-size: var(--text-sm);
+.devices {
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
 }
 
-.cols {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: var(--space-6) var(--space-8);
+.device {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 28px;
+  color: var(--text-soft);
 }
 
-.h3 {
-  margin-bottom: var(--space-4);
-  color: var(--muted);
-  font-size: var(--text-md);
+.device + .device {
+  border-top: 1px solid var(--surface-3);
+}
+
+.deviceText {
+  flex: 1;
+}
+
+.deviceText strong {
+  color: var(--text);
+  font-size: 24px;
   font-weight: 600;
+}
+
+.deviceText span {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.connected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.connected::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--ok);
+}
+
+.tabsRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tabs {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+}
+
+.tab {
+  height: 52px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text-soft);
+  font: 600 22px var(--font-body);
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  background: var(--text);
+  color: var(--ink);
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 12px;
   margin: 0;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 170px 1fr auto;
   align-items: center;
-  gap: var(--space-4);
+  gap: 24px;
 }
 
 .inputs {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-}
-
-.kbd {
-  padding: 2px var(--space-3);
-  border: 1px solid var(--muted);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font: 600 var(--text-xs) var(--font-body);
-  white-space: nowrap;
+  gap: 8px;
 }
 
 .does {
   margin: 0;
-  font-size: var(--text-md);
+  font-size: 24px;
+}
+
+.kbd {
+  padding: 4px 12px;
+  border: 1px solid #3a3d44;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font: 600 16px var(--font-body);
+  white-space: nowrap;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 20px;
 }
 
 .close {
-  margin-top: var(--space-7);
-  padding: var(--space-3) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 20px 6px 6px;
   border: 0;
-  border-radius: var(--radius-md);
-  background: var(--text);
-  color: var(--ink);
-  font-size: var(--text-md);
-  font-weight: 700;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--muted);
+  font: 500 20px var(--font-body);
   cursor: pointer;
+}
+
+.close:focus-visible,
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .tooltip {
+    transition: none;
+  }
+  .sheet[open] {
+    animation: none;
+  }
 }

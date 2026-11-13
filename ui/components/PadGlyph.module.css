@@ -1,0 +1,71 @@
+/* Controller button glyphs (designs: TV · Controls sheet). Face buttons in their real colours, light enough for the dark sheet. */
+.face {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: #26292f;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.face svg {
+  width: 20px;
+  height: 20px;
+}
+
+.a {
+  color: #6cc24a;
+}
+
+.b {
+  color: #f0828c;
+}
+
+.x {
+  color: #6fa8e8;
+}
+
+.y {
+  color: #f2c230;
+}
+
+/* On PlayStation the colours follow the shapes: ✕ blue, ○ red, □ pink, △ green. (A class, not :has(): older webOS browsers lack it.) */
+.ps.a {
+  color: #8fb4f0;
+}
+
+.ps.x {
+  color: #efa2d0;
+}
+
+.ps.y {
+  color: #6fd3ae;
+}
+
+.pill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: #26292f;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.dpad {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin: 0 7px;
+  fill: var(--text);
+}

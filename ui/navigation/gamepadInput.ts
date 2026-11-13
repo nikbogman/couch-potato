@@ -1,25 +1,27 @@
 // Gamepad polling: starts when a pad is connected, turns the pure decoder's actions into events anyone can subscribe to.
 import { useEffect, useEffectEvent, useSyncExternalStore } from "react";
-import { decodePad, mergePads, type PadAction, type PadState, type Snapshot } from "./gamepad";
+import { decodePad, mergePads, padFamily, type PadAction, type PadFamily, type PadState, type Snapshot } from "./gamepad";
 
 const listeners = new Set<(a: PadAction) => void>();
 const watchers = new Set<() => void>();
 let connected = false;
+let family: PadFamily = "xbox";
 let frame = 0;
 let state: PadState = {};
 
 const snapshot = (p: Gamepad): Snapshot => ({ buttons: p.buttons.map((b) => b.pressed), axes: [...p.axes] });
 const connectedPads = () => [...(navigator.getGamepads?.() ?? [])].filter((p): p is Gamepad => !!p && p.connected);
 
-function setConnected(c: boolean) {
-  if (c === connected) return;
+function setConnected(c: boolean, f: PadFamily = family) {
+  if (c === connected && f === family) return;
   connected = c;
+  family = f;
   watchers.forEach((w) => w());
 }
 
 function tick(now: number, fresh = false) {
   const pads = connectedPads();
-  setConnected(pads.length > 0);
+  setConnected(pads.length > 0, pads[0] ? padFamily(pads[0].id) : family);
   if (!pads.length) return void (frame = 0); // 'gamepadconnected' restarts the loop
   const r = decodePad(fresh ? {} : state, mergePads(pads.map(snapshot)), now);
   state = r.state;
@@ -61,5 +63,17 @@ export function usePadConnected() {
     },
     () => connected,
     () => false,
+  );
+}
+
+/** The first connected pad's button labels (Xbox until a PlayStation pad shows up). */
+export function usePadFamily(): PadFamily {
+  return useSyncExternalStore(
+    (w) => {
+      watchers.add(w);
+      return () => void watchers.delete(w);
+    },
+    () => family,
+    () => "xbox" as const,
   );
 }

@@ -1,7 +1,8 @@
-// Pure Xbox-controller decoding: a snapshot of the pad in, discrete actions out. The polling loop lives in gamepadInput.ts.
+// Pure controller decoding: a snapshot of the pad in, discrete actions out. The polling loop lives in gamepadInput.ts.
+// Actions are named after the Xbox buttons; a PlayStation pad has the same buttons in the same places (✕ = a, ○ = b, □ = x, △ = y, L1 = lb, L2 = lt).
 import type { RemoteCommand } from "../../shared/playback";
 
-export type PadAction = "up" | "down" | "left" | "right" | "a" | "b" | "y" | "lb" | "rb" | "menu";
+export type PadAction = "up" | "down" | "left" | "right" | "a" | "b" | "x" | "y" | "lb" | "rb" | "lt" | "rt" | "menu";
 export type Snapshot = { buttons: boolean[]; axes: number[] };
 /** Held actions, with when a held direction may repeat next. */
 export type PadState = Partial<Record<PadAction, { next: number }>>;
@@ -11,8 +12,12 @@ export const REPEAT_DELAY = 400;
 export const REPEAT_EVERY = 120;
 
 // "standard" Gamepad mapping
-const BUTTONS: Record<number, PadAction> = { 0: "a", 1: "b", 3: "y", 4: "lb", 5: "rb", 9: "menu", 12: "up", 13: "down", 14: "left", 15: "right" };
-const ORDER: PadAction[] = ["up", "down", "left", "right", "a", "b", "y", "lb", "rb", "menu"];
+const BUTTONS: Record<number, PadAction> = { 0: "a", 1: "b", 2: "x", 3: "y", 4: "lb", 5: "rb", 6: "lt", 7: "rt", 9: "menu", 12: "up", 13: "down", 14: "left", 15: "right" };
+const ORDER: PadAction[] = ["up", "down", "left", "right", "a", "b", "x", "y", "lb", "rb", "lt", "rt", "menu"];
+
+/** Which button labels to show for a pad, from its Gamepad `id` (Sony's USB vendor id is 054c). */
+export type PadFamily = "ps" | "xbox";
+export const padFamily = (id: string): PadFamily => (/054c|playstation|dualshock|dualsense|sony/i.test(id) ? "ps" : "xbox");
 export const isDirection = (a: PadAction): a is "up" | "down" | "left" | "right" => a === "up" || a === "down" || a === "left" || a === "right";
 
 function heldActions(s: Snapshot): Set<PadAction> {
@@ -62,9 +67,12 @@ export function playbackFor(a: PadAction): RemoteCommand | "back" | "menu" | nul
     case "a": return { cmd: "togglePlay" };
     case "left": return { cmd: "seekBy", delta: -10 };
     case "right": return { cmd: "seekBy", delta: 10 };
-    case "lb": return { cmd: "seekBy", delta: -30 };
-    case "rb": return { cmd: "seekBy", delta: 30 };
+    case "lb":
+    case "lt": return { cmd: "seekBy", delta: -30 };
+    case "rb":
+    case "rt": return { cmd: "seekBy", delta: 30 };
     case "y": return { cmd: "nextEpisode" };
+    case "x": return { cmd: "switchPlayer" };
     case "b": return "back";
     case "menu": return "menu";
     default: return null;

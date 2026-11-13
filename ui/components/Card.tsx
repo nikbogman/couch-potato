@@ -16,7 +16,7 @@ function resumeLine(p: Resume): string {
  * Poster card linking to a title page. `badge` adds the Movie/Series tag (needed where types are mixed).
  * `progress` switches to the landscape Continue watching variant: backdrop, bottom progress bar (once started) and time left;
  * `onRemove` adds a button for dropping it from that row: it is out of the arrow-key order (so Up/Right never land on it);
- * from the keyboard the focused card is removed with Delete (the pad's Y fires the same key).
+ * from the keyboard the focused card is removed with Delete (the pad's X, □ on PlayStation, fires the same key).
  */
 export function Card({
   r,

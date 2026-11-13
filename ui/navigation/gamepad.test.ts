@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { decodePad, mergePads, playbackFor, REPEAT_DELAY, REPEAT_EVERY, type PadState, type Snapshot } from "./gamepad";
+import { decodePad, mergePads, padFamily, playbackFor, REPEAT_DELAY, REPEAT_EVERY, type PadState, type Snapshot } from "./gamepad";
 
 const snap = (pressed: number[] = [], axes: number[] = [0, 0]): Snapshot => {
   const buttons = Array<boolean>(17).fill(false);
@@ -21,8 +21,8 @@ test("buttons fire once per press, not while held", () => {
 });
 
 test("maps the standard buttons", () => {
-  const pressed = run([[0, snap([0, 1, 3, 4, 5, 9])]])[0];
-  expect(pressed).toEqual(["a", "b", "y", "lb", "rb", "menu"]);
+  const pressed = run([[0, snap([0, 1, 2, 3, 4, 5, 6, 7, 9])]])[0];
+  expect(pressed).toEqual(["a", "b", "x", "y", "lb", "rb", "lt", "rt", "menu"]);
   expect(run([[0, snap([12, 13, 14, 15])]])[0]).toEqual(["up", "down", "left", "right"]);
 });
 
@@ -72,8 +72,16 @@ test("playback mapping", () => {
   expect(playbackFor("right")).toEqual({ cmd: "seekBy", delta: 10 });
   expect(playbackFor("lb")).toEqual({ cmd: "seekBy", delta: -30 });
   expect(playbackFor("rb")).toEqual({ cmd: "seekBy", delta: 30 });
+  expect(playbackFor("lt")).toEqual({ cmd: "seekBy", delta: -30 });
+  expect(playbackFor("rt")).toEqual({ cmd: "seekBy", delta: 30 });
   expect(playbackFor("y")).toEqual({ cmd: "nextEpisode" });
+  expect(playbackFor("x")).toEqual({ cmd: "switchPlayer" });
   expect(playbackFor("b")).toBe("back");
   expect(playbackFor("menu")).toBe("menu");
   expect(playbackFor("up")).toBeNull();
+});
+
+test("PlayStation pads are told apart by name or Sony's vendor id; anything else gets Xbox labels", () => {
+  for (const id of ["Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 09cc)", "DualSense Wireless Controller", "054c-0ce6-Wireless Controller"]) expect(padFamily(id)).toBe("ps");
+  for (const id of ["Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 0b13)", "8BitDo Pro 2", ""]) expect(padFamily(id)).toBe("xbox");
 });
