@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import type { Target } from "../../shared/types";
 import { watchPath } from "../../shared/protocol";
 import { useRemote } from "../remote/RemoteContext";
@@ -34,9 +34,11 @@ export function PlayButton({
 }) {
   const remote = useRemote();
   const player = usePreferredPlayer(); // starts in the player chosen on the title page
+  const { pathname } = useLocation();
   if (!remote)
     return (
-      <Link to={watchPath(target) + (player === DEFAULT_PLAYER ? "" : `?player=${player}`)} {...props}>
+      // `from`: the player's Back returns to this entry instead of stacking a new one (see Player).
+      <Link to={watchPath(target) + (player === DEFAULT_PLAYER ? "" : `?player=${player}`)} state={{ from: pathname }} {...props}>
         {children}
       </Link>
     );

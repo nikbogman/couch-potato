@@ -44,7 +44,8 @@ export function Player({ kind }: { kind: "movie" | "tv" }) {
 
 function PlayerScreen({ id, season, episode }: { id: string; season?: number; episode?: number }) {
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const location = useLocation();
+  const { search } = location;
   const [params, setParams] = useSearchParams();
   const isTv = season !== undefined && episode !== undefined;
   const target: Target = isTv ? { mediaType: "tv", id, season, episode } : { mediaType: "movie", id };
@@ -149,7 +150,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     }
     if (isTv && e.kind === "episodechange" && e.season !== undefined && e.episode !== undefined && `${e.season}/${e.episode}` !== here) {
       movedTo.current = `${e.season}/${e.episode}`;
-      navigate({ pathname: `/watch/tv/${id}/${e.season}/${e.episode}`, search }, { replace: true });
+      navigate({ pathname: `/watch/tv/${id}/${e.season}/${e.episode}`, search }, { replace: true, state: location.state });
     }
   });
   /** Reload the same title in the other player, where this one is. The old tracker saves on its way out. Returns the start used. */
@@ -194,7 +195,14 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     if (group.current?.contains(document.activeElement)) group.current.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
   }, [player]);
 
-  const back = () => void leave().then(() => navigate(isTv ? `/tv/${id}` : `/movie/${id}`));
+  // The player is a detour, never a step in history: Back returns to the title page's own entry when we came from it,
+  // otherwise (Home's hero, a cast from the phone) the title page takes the player's place. Either way Back there leads home.
+  const back = () =>
+    void leave().then(() => {
+      const title = isTv ? `/tv/${id}` : `/movie/${id}`;
+      if ((location.state as { from?: string } | null)?.from === title && history.state?.idx > 0) navigate(-1);
+      else navigate(title, { replace: true });
+    });
 
   // Phone commands. The iframe is the only thing that plays; everything else is this screen's own navigation.
   const post = (cmd: PlaybackCommand) => {
@@ -210,7 +218,7 @@ function PlayerScreen({ id, season, episode }: { id: string; season?: number; ep
     top?.postMessage(payload, "*");
     if (events && events !== top) events.postMessage(payload, "*");
   };
-  const goNext = () => next && void leave().then(() => navigate({ pathname: watchPath({ mediaType: "tv", id, ...next }), search }));
+  const goNext = () => next && void leave().then(() => navigate({ pathname: watchPath({ mediaType: "tv", id, ...next }), search }, { replace: true, state: location.state }));
   // The player is told too (its own fullscreen UI), though a browser lets it go fullscreen only after a press on the TV.
   // In the desktop app the window itself goes fullscreen, which needs no press. In a browser, a command from the phone
   // has no press behind it, so the browser refuses unless a policy allows it (AutomaticFullscreenAllowedForUrls).
