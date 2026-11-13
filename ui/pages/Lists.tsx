@@ -57,7 +57,7 @@ export function ListRow({ list, hideEmpty = false }: { list: List; hideEmpty?: b
 }
 
 /** One counter square: the list's icon and its size. The selected one fills with the list's colour. */
-function Counter({ list, selected, onSelect, big }: { list: List; selected: boolean; onSelect: () => void; big: boolean }) {
+function Counter({ list, selected, onSelect, big, pill }: { list: List; selected: boolean; onSelect: () => void; big: boolean; pill?: boolean }) {
   const total = useList(list).data?.pages[0]?.total;
   return (
     <button
@@ -65,7 +65,7 @@ function Counter({ list, selected, onSelect, big }: { list: List; selected: bool
       role="tab"
       aria-selected={selected}
       aria-label={`${LIST_LABELS[list]}${total === undefined ? "" : `, ${total}`}`}
-      className={styles.counter}
+      className={`${styles.counter} ${pill ? styles.pill : ""}`}
       style={{ "--c": listColor(list) } as CSSProperties}
       onClick={onSelect}
     >
@@ -100,32 +100,33 @@ export function Lists() {
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, items.length]);
 
-  // The counters stick under the header and shrink to pills once the heading has scrolled away under it.
-  const heading = useRef<HTMLHeadingElement>(null);
-  const bar = useRef<HTMLDivElement>(null);
+  // Once the counter squares have scrolled away under the header, a pinned bar of pills takes over. It takes no room in the
+  // page, so showing it moves nothing (a shrinking bar moved the content, scroll anchoring moved it back: a stutter).
+  const squares = useRef<HTMLDivElement>(null);
+  const pinned = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
   useEffect(() => {
-    const h = heading.current;
-    if (!h || !bar.current) return;
-    const top = parseFloat(getComputedStyle(bar.current).top) || 0;
+    if (!squares.current || !pinned.current) return;
+    const top = parseFloat(getComputedStyle(pinned.current).top) || 0;
     const io = new IntersectionObserver(([e]) => e && setStuck(!e.isIntersecting && e.boundingClientRect.top < top), { rootMargin: `-${top}px 0px 0px 0px` });
-    io.observe(h);
+    io.observe(squares.current);
     return () => io.disconnect();
   }, []);
+  const counters = (pill: boolean) =>
+    LISTS.map((l) => <Counter key={l} list={l} selected={l === list} big={!remote} pill={pill} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />);
 
   return (
     <div className={`${styles.page} ${remote ? "" : styles.tv}`}>
-      <h1 ref={heading} className={styles.h1}>
-        My lists
-      </h1>
-      <div ref={bar} className={styles.bar} data-stuck={stuck || undefined}>
-        <div className={styles.counters} role="tablist" aria-label="List">
-          {LISTS.map((l) => (
-            <Counter key={l} list={l} selected={l === list} big={!remote} onSelect={() => setParams(l === "to_watch" ? {} : { list: l }, { replace: true })} />
-          ))}
-        </div>
+      <h1 className={styles.h1}>My lists</h1>
+      <div ref={squares} className={styles.counters} role="tablist" aria-label="List" inert={stuck}>
+        {counters(false)}
       </div>
       <section role="tabpanel" aria-label={LIST_LABELS[list]}>
+        <div ref={pinned} className={styles.pinned} data-shown={stuck || undefined} inert={!stuck}>
+          <div className={styles.pills} role="tablist" aria-label="List">
+            {counters(true)}
+          </div>
+        </div>
         {q.isError ? (
           <LoadError what={LIST_LABELS[list]} retry={() => q.refetch()} />
         ) : !first ? (

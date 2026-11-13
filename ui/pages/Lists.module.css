@@ -12,22 +12,41 @@
   letter-spacing: -0.02em;
 }
 
-/* Pinned under the header, so the lists can be switched from anywhere down the page. */
-.bar {
+/* Pinned under the header once the squares have scrolled away, so the lists can be switched from anywhere down the page.
+   Zero height: it takes no room, so showing it never moves the content. */
+.pinned {
   position: sticky;
   top: calc(var(--header-h) + env(safe-area-inset-top));
   z-index: 4;
+  height: 0;
+}
+
+.pills {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
   margin: 0 calc(-1 * var(--safe-x));
   padding: 8px var(--safe-x);
   background: var(--ink);
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  transition: opacity 160ms ease-out, transform 160ms ease-out, visibility 0s 160ms;
+}
+
+.pinned[data-shown] .pills {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
 }
 
 /* Focus moved by the pad stays clear of the header and the pinned counters. */
-:global(html):has(.bar) {
+:global(html):has(.pinned) {
   scroll-padding-top: calc(var(--header-h) + 112px);
 }
 
-:global(html):has(:global(.remote) .bar) {
+:global(html):has(:global(.remote) .pinned) {
   scroll-padding-top: 128px;
 }
 
@@ -51,7 +70,7 @@
   color: var(--text);
   text-align: left;
   cursor: pointer;
-  transition: background-color 180ms ease-out, color 180ms ease-out, padding 180ms ease-out;
+  transition: background-color 180ms ease-out, color 180ms ease-out;
 }
 
 .counter[aria-selected="true"] {
@@ -220,8 +239,8 @@
   list-style: none;
 }
 
-/* Pinned: each square becomes a pill of icon, number and label in a line. */
-.bar[data-stuck] .counter {
+/* A counter as a pill: icon, number and label in a line. */
+.counter.pill {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
@@ -231,37 +250,34 @@
   border-radius: var(--radius-full);
 }
 
-.bar[data-stuck] .figure {
+.pill .figure {
   flex-direction: row;
   align-items: baseline;
   gap: 5px;
   min-width: 0;
 }
 
-.bar[data-stuck] .number {
+.pill .number {
   font-size: 18px;
 }
 
-.bar[data-stuck] .what {
+.pill .what {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.tv .bar {
+.tv .pills {
+  grid-template-columns: repeat(3, 220px);
+  gap: var(--space-5);
   padding-block: var(--space-4);
 }
 
-.tv .bar[data-stuck] .counter {
+.tv .counter.pill {
   gap: 14px;
   padding: 14px 24px;
 }
 
-.tv .bar[data-stuck] .number {
+.tv .pill .number {
   font-size: 36px;
-}
-
-/* Room below the grid, so a short list can still scroll the counters up to their pinned size. */
-.tv {
-  padding-bottom: calc(var(--space-9) + 160px);
 }
