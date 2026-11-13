@@ -1,10 +1,11 @@
 import type { PadFamily } from "../navigation/gamepad";
 import styles from "./PadGlyph.module.css";
 
-export type PadButton = "a" | "b" | "x" | "y" | "lb" | "rb" | "lt" | "rt" | "menu" | "dpad" | "leftRight";
+export type PadButton = "a" | "b" | "x" | "y" | "lb" | "rb" | "lt" | "rt" | "view" | "menu" | "dpad" | "leftRight";
 
-const XBOX = { a: "A", b: "B", x: "X", y: "Y", lb: "LB", rb: "RB", lt: "LT", rt: "RT", menu: "Menu" } as const;
-const PS = { lb: "L1", rb: "R1", lt: "L2", rt: "R2", menu: "OPTIONS" } as const;
+const XBOX = { a: "A", b: "B", x: "X", y: "Y", lb: "LB", rb: "RB", lt: "LT", rt: "RT", view: "View", menu: "Menu" } as const;
+/** SHARE on a PS4 pad, CREATE on a PS5 one: same button. */
+const PS = { lb: "L1", rb: "R1", lt: "L2", rt: "R2", view: "SHARE", menu: "OPTIONS" } as const;
 /** PlayStation face buttons are shapes, not letters: ✕ ○ □ △ in the same places as A B X Y. */
 const SHAPES = {
   a: <path d="M5 5l14 14M19 5L5 19" />,
@@ -32,6 +33,15 @@ export function PadGlyph({ b, family }: { b: PadButton; family: PadFamily }) {
       </span>
     ) : (
       <span className={`${styles.face} ${styles[b]}`}>{XBOX[b]}</span>
+    );
+  if (b === "view" && family === "xbox")
+    return (
+      <span className={styles.pill} role="img" aria-label="View">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="13" height="10" rx="1.5" />
+          <path d="M8 18h11.5a1.5 1.5 0 0 0 1.5-1.5V9" />
+        </svg>
+      </span>
     );
   if (b === "menu" && family === "xbox")
     return (

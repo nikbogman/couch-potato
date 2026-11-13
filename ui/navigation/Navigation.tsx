@@ -25,7 +25,8 @@ export function Navigation() {
   const { pathname, key } = useLocation();
   const navType = useNavigationType();
   const shownPath = useRef(pathname); // the page focus was last placed for
-  const lastFocused = useRef(new Map<string, string>()); // history entry -> href of the link focused on it, so Back lands where you left
+  // history entry -> the link focused on it (href, and which of the links with that href: Home's hero and a poster can share one), so Back lands where you left
+  const lastFocused = useRef(new Map<string, { href: string; n: number }>());
   const navigate = useNavigate();
   const watching = pathname.startsWith("/watch/");
   const off = pathname === "/remote" || pathname.startsWith("/remote/");
@@ -37,8 +38,11 @@ export function Navigation() {
   useEffect(() => {
     if (off) return;
     const onFocus = (e: FocusEvent) => {
-      const href = e.target instanceof Element ? e.target.closest("main a[href]")?.getAttribute("href") : null;
-      if (href) lastFocused.current.set(history.state?.key ?? "default", href); // the first entry has no key; the router calls it "default"
+      const link = e.target instanceof Element ? e.target.closest("main a[href]") : null;
+      const href = link?.getAttribute("href");
+      if (!href) return;
+      const n = [...document.querySelectorAll(`main a[href="${CSS.escape(href)}"]`)].indexOf(link!);
+      lastFocused.current.set(history.state?.key ?? "default", { href, n }); // the first entry has no key; the router calls it "default"
     };
     document.addEventListener("focusin", onFocus);
     return () => document.removeEventListener("focusin", onFocus);
@@ -128,7 +132,7 @@ export function Navigation() {
       clearTimeout(timer);
     };
     const check = () => {
-      const card = want ? document.querySelector<HTMLElement>(`main a[href="${CSS.escape(want)}"]`) : null;
+      const card = want ? document.querySelectorAll<HTMLElement>(`main a[href="${CSS.escape(want.href)}"]`)[want.n] : null;
       const a = document.activeElement;
       if (card) focusAndReveal(card, false);
       if (card || (a && a !== document.body) || (!want && restoreFocus(true))) done();

@@ -27,6 +27,7 @@ const WATCH: Row[] = [
   { pad: ["lt", "rt"], does: "Back / forward 30 s" },
   { pad: ["y"], does: "Next episode" },
   { pad: ["x"], does: "Switch player" },
+  { pad: ["view"], does: "Full screen", keys: "F" },
   { pad: ["b"], does: "Leave fullscreen, then back", keys: "Esc" },
   { pad: ["menu"], does: "Show the player bar" },
 ];

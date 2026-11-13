@@ -21,8 +21,8 @@ test("buttons fire once per press, not while held", () => {
 });
 
 test("maps the standard buttons", () => {
-  const pressed = run([[0, snap([0, 1, 2, 3, 4, 5, 6, 7, 9])]])[0];
-  expect(pressed).toEqual(["a", "b", "x", "y", "lb", "rb", "lt", "rt", "menu"]);
+  const pressed = run([[0, snap([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])]])[0];
+  expect(pressed).toEqual(["a", "b", "x", "y", "lb", "rb", "lt", "rt", "view", "menu"]);
   expect(run([[0, snap([12, 13, 14, 15])]])[0]).toEqual(["up", "down", "left", "right"]);
 });
 
@@ -76,6 +76,7 @@ test("playback mapping", () => {
   expect(playbackFor("rt")).toEqual({ cmd: "seekBy", delta: 30 });
   expect(playbackFor("y")).toEqual({ cmd: "nextEpisode" });
   expect(playbackFor("x")).toEqual({ cmd: "switchPlayer" });
+  expect(playbackFor("view")).toEqual({ cmd: "fullscreen" });
   expect(playbackFor("b")).toBe("back");
   expect(playbackFor("menu")).toBe("menu");
   expect(playbackFor("up")).toBeNull();

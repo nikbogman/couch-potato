@@ -105,7 +105,12 @@ export function focusAndReveal(el: HTMLElement, smooth = true) {
   const behavior = smooth && !reducedMotion() ? "smooth" : "instant";
   const track = el.closest<HTMLElement>("[data-track]");
   const item = track && [...track.children].find((c) => c.contains(el));
-  if (!track || !item) return el.scrollIntoView({ block: "nearest", inline: "nearest", behavior });
+  if (!track || !item) {
+    // The header, and anything that fits on the first screen (the hero's buttons), show the page from its top:
+    // "nearest" would leave it scrolled part-way, a strip of empty page above, and each Up would only nudge it.
+    const top = !!el.closest("[data-app-header]") || el.getBoundingClientRect().bottom + scrollY <= innerHeight - 48;
+    return top ? window.scrollTo({ top: 0, behavior }) : el.scrollIntoView({ block: "nearest", inline: "nearest", behavior });
+  }
   const edge = track.getBoundingClientRect().left;
   const box = item.getBoundingClientRect();
   track.scrollTo({
@@ -142,7 +147,11 @@ export function moveFocus(d: Dir, root: ParentNode = document): boolean {
   if (!(active instanceof HTMLElement) || active === document.body) return restoreFocus(false);
   const all = focusables(root);
   // `active` may be among the candidates; its own centre is never ahead of itself, so it is skipped.
-  const to = all[pickNext(active.getBoundingClientRect(), all.map((el) => el.getBoundingClientRect()), d)];
+  const pick = (cands: HTMLElement[]) => cands[pickNext(active.getBoundingClientRect(), cands.map((el) => el.getBoundingClientRect()), d)];
+  // The pinned header is always on screen, so from a row it looks nearer than the page content above that is scrolled away.
+  // Going up stays in the page while there is page above; the header comes after its top.
+  const main = active.closest("main");
+  const to = (d === "up" && main ? pick(all.filter((el) => main.contains(el))) : undefined) ?? pick(all);
   if (to) focusAndReveal(to);
   return !!to;
 }
