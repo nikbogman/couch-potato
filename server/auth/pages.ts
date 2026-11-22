@@ -1,6 +1,6 @@
 // The pages served before sign-in: sign in (phone), pair (TV) and join (invite). Self-contained (inline CSS and script, no app bundle).
 import { renderSVG } from "uqr";
-import { APP_NAME, MARK, markPaths } from "../../shared/brand";
+import { APP_NAME, markSvg } from "../../shared/brand";
 import { MIN_PASSWORD } from "./accounts";
 
 /** Where to go after sign-in: same-site paths only (no `//host`, no backslash tricks). */
@@ -8,8 +8,7 @@ export const safeNext = (next: string | null | undefined, fallback = "/remote") 
 
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-const mark = (size: number) =>
-  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6.7" fill="${MARK.ink}" stroke="rgb(255 255 255 / 0.12)" stroke-width="0.5"/><g transform="translate(3 3) scale(0.75)">${markPaths()}</g></svg>`;
+const mark = markSvg;
 
 /** The app's tokens (ui/styles.css), inlined: these pages are served before sign-in. */
 const BASE = `
@@ -58,7 +57,7 @@ export function loginPage({ next, name = "", error = false, replaced = false }: 
     APP_NAME,
     FORM_CSS,
     `<main><div class="col">
-  <div class="brand">${mark(72)}<h1 class="sr-only">${APP_NAME}</h1></div>
+  <div class="brand">${mark(120)}<h1 class="sr-only">${APP_NAME}</h1></div>
   ${replaced ? `<p class="notice" role="status">You signed in on another phone, so this one was signed out. Your TV is still paired.</p>` : ""}
   <form method="post" action="/login">
     <label>Name<input name="name" value="${esc(name)}" autocomplete="username" autocapitalize="none" required ${name ? "" : "autofocus"}></label>
@@ -79,7 +78,7 @@ export function joinPage({ token, inviter, name = "", error }: { token: string; 
     `Join ${APP_NAME}`,
     FORM_CSS,
     `<main><div class="col">
-  <div class="lead">${mark(56)}<h1>${esc(inviter)} invited you to ${APP_NAME}</h1>
+  <div class="lead">${mark(72)}<h1>${esc(inviter)} invited you to ${APP_NAME}</h1>
     <p>Pick a name and a password. You get your own lists, your own TV and your phone as its remote.</p></div>
   <form method="post" action="/join/${esc(token)}">
     <label>Name<input name="name" value="${esc(name)}" autocomplete="username" autocapitalize="none" maxlength="32" required autofocus ${error === "taken" || error === "name" ? 'aria-invalid="true"' : ""}></label>
@@ -96,7 +95,7 @@ export const inviteGonePage = () =>
   page(
     APP_NAME,
     FORM_CSS,
-    `<main><div class="col"><div class="lead">${mark(56)}<h1>This invite has expired</h1><p>Invite links work once and last 7 days. Ask for a new one.</p></div></div></main>`,
+    `<main><div class="col"><div class="lead">${mark(72)}<h1>This invite has expired</h1><p>Invite links work once and last 7 days. Ask for a new one.</p></div></div></main>`,
     410,
   );
 
@@ -138,7 +137,7 @@ export function pairPage({ origin, code, msLeft, replaced }: { origin: string; c
   return page(
     `Pair this TV · ${APP_NAME}`,
     PAIR_CSS,
-    `<div class="brand">${mark(40)}<span class="sr-only">${APP_NAME}</span></div>
+    `<div class="brand">${mark(88)}<span class="sr-only">${APP_NAME}</span></div>
 ${replaced ? `<p class="banner" role="status">Signed out: your account was paired with another TV.</p>` : ""}
 <main>
   <div class="how">

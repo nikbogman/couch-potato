@@ -49,7 +49,7 @@ export function TvLayout() {
       <header data-app-header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
         <div className={styles.left}>
           <span className={styles.wordmark} translate="no">
-            <BrandMark size={40} />
+            <BrandMark size={84} />
             <span className="sr-only">{APP_NAME}</span>
           </span>
         </div>

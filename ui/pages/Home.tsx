@@ -22,7 +22,7 @@ export function Home() {
         // Phone screens start with their title (designs): here the app's name, with the TV status.
         <div className={styles.head}>
           <h1 className={styles.h1} translate="no">
-            <BrandMark size={32} />
+            <BrandMark size={52} />
             <span className="sr-only">{APP_NAME}</span>
           </h1>
           <span style={{ display: "flex", gap: "var(--space-2)" }}>
