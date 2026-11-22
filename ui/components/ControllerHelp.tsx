@@ -15,7 +15,7 @@ const BROWSE: Row[] = [
   { pad: ["a"], does: "Select", keys: "Enter" },
   { pad: ["b"], does: "Back", keys: "Esc" },
   { pad: ["y"], does: "Search", keys: "/" },
-  { pad: ["x"], does: "Remove from Continue watching", keys: "Delete" },
+  { pad: ["x"], does: "Remove from Continue watching · episode watched", keys: "Delete" },
   { pad: ["lb", "rb"], does: "Previous / next tab · season" },
   { pad: ["lt", "rt"], does: "Page up / down", keys: "PgUp PgDn" },
   { pad: ["menu"], does: "Controls" },

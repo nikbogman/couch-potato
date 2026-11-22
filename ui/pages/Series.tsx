@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "react-router";
-import { backdropUrl, fetchSeason, fetchSeries, type EpisodeSummary, type SeriesDetails } from "../lib/api";
+import { backdropUrl, fetchSeason, fetchSeries, setWatched, type EpisodeSummary, type SeriesDetails } from "../lib/api";
 import { PLAY_ON_TV, NoTvNote, PlayButton } from "../components/PlayButton";
 import { ScrollRow } from "../components/ScrollRow";
 import { ListToggles } from "../components/ListToggles";
@@ -13,6 +13,15 @@ import { placeFocus } from "../navigation/spatial";
 import { formatRuntime, timeLeft } from "../lib/format";
 import { useRemote } from "../remote/RemoteContext";
 import styles from "./Series.module.css";
+
+/** Mark episodes or a season watched; everything progress-shaped (Play, episode lists, Continue watching) refetches. */
+function useMarkWatched(id: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ season, watched, episode }: { season: number; watched: boolean; episode?: number }) => setWatched(id, season, watched, episode),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["progress"] }),
+  });
+}
 
 export function Series() {
   const { id = "" } = useParams();
@@ -110,6 +119,7 @@ function Picker({ s, season, select }: { s: SeriesDetails; season: number; selec
           </button>
         ))}
       </div>
+      {!!episodes?.length && !isPlaceholderData && <SeasonMark id={s.id} season={season} episodes={episodes} />}
       </div>
       {isError ? (
         <LoadError what="episodes" retry={() => refetch()} />
@@ -138,10 +148,33 @@ function Picker({ s, season, select }: { s: SeriesDetails; season: number; selec
   );
 }
 
+/** "Mark season watched", or "Season watched" (pressing it clears the season) once every aired episode is. */
+function SeasonMark({ id, season, episodes }: { id: number; season: number; episodes: EpisodeSummary[] }) {
+  const mark = useMarkWatched(id);
+  const all = episodes.every((e) => e.progress?.finished);
+  return (
+    <button type="button" className={styles.seasonMark} aria-pressed={all} disabled={mark.isPending} onClick={() => mark.mutate({ season, watched: !all })}>
+      <ListIcon list="watched" size={28} filled={all} />
+      {mark.isError ? "Couldn’t save" : all ? "Season watched" : "Mark season watched"}
+    </button>
+  );
+}
+
+/** The watched check beside an episode: outlined until watched; pressing it flips the episode. */
+function EpisodeMark({ on, label, pending, toggle, className }: { on: boolean; label: string; pending: boolean; toggle: () => void; className?: string }) {
+  return (
+    <button type="button" tabIndex={-1} className={className} aria-pressed={on} aria-label={`${label} watched`} title={on ? "Watched" : "Mark watched"} disabled={pending} onClick={toggle}>
+      <ListIcon list="watched" size={44} filled={on} />
+    </button>
+  );
+}
+
 function EpisodeRow({ id, season, e }: { id: number; season: number; e: EpisodeSummary }) {
   const remote = useRemote();
+  const mark = useMarkWatched(id);
   const p = e.progress;
   return (
+    <div className={styles.rowWrap}>
     <PlayButton target={{ mediaType: "tv", id, season, episode: e.episode }} className={styles.row} data-episode={e.episode}>
       <div className={styles.still}>
         {e.stillPath && <img src={backdropUrl(e.stillPath, "w300")} alt="" width={300} height={169} loading="lazy" />}
@@ -160,27 +193,42 @@ function EpisodeRow({ id, season, e }: { id: number; season: number; e: EpisodeS
         </div>
         <p className={styles.blurb}>{e.overview}</p>
       </div>
-      {p?.finished && (
-        <span className={styles.check} role="img" aria-label="Watched">
-          <ListIcon list="watched" size={44} />
-        </span>
-      )}
       {remote && (
         <span className={styles.cast} role="img" aria-label="Play on TV">
           ▶
         </span>
       )}
     </PlayButton>
+    <EpisodeMark
+      on={!!p?.finished}
+      label={`Episode ${e.episode}`}
+      pending={mark.isPending}
+      toggle={() => mark.mutate({ season, watched: !p?.finished, episode: e.episode })}
+      className={styles.check}
+    />
+    </div>
   );
 }
 
-/** TV episode card (designs: TV · Title): still with "E4" and a progress edge (grey once watched), name, "57 min · Watched". */
+/**
+ * TV episode card (designs: TV · Title): still with "E4" and a progress edge (grey once watched), name, "57 min · Watched".
+ * X (Delete) flips watched; the check on the still does the same with a mouse, out of the arrow-key order like Card's remove.
+ */
 function EpisodeCard({ id, season, e }: { id: number; season: number; e: EpisodeSummary }) {
+  const mark = useMarkWatched(id);
   const p = e.progress;
+  const toggle = () => !mark.isPending && mark.mutate({ season, watched: !p?.finished, episode: e.episode });
   const fill = p ? (p.finished ? 100 : Math.min(100, (p.position / p.duration) * 100)) : 0;
   const meta = p?.finished ? [e.runtime && formatRuntime(e.runtime), "Watched"] : p ? [timeLeft(p.position, p.duration)] : [e.runtime && formatRuntime(e.runtime)];
   return (
-    <PlayButton target={{ mediaType: "tv", id, season, episode: e.episode }} className={styles.card} data-episode={e.episode}>
+    <div className={styles.cardWrap}>
+    <PlayButton
+      target={{ mediaType: "tv", id, season, episode: e.episode }}
+      className={styles.card}
+      data-episode={e.episode}
+      aria-keyshortcuts="Delete"
+      onKeyDown={(k) => k.key === "Delete" && (k.preventDefault(), toggle())}
+    >
       <span className={styles.frame}>
         {e.stillPath && <img src={backdropUrl(e.stillPath, "w300")} alt="" width={300} height={169} loading="lazy" />}
         <span className={styles.ep}>E{e.episode}</span>
@@ -189,5 +237,7 @@ function EpisodeCard({ id, season, e }: { id: number; season: number; e: Episode
       <span className={styles.cardTitle}>{e.name}</span>
       <span className={styles.cardMeta}>{meta.filter(Boolean).join(" · ")}</span>
     </PlayButton>
+    <EpisodeMark on={!!p?.finished} label={`Episode ${e.episode}`} pending={mark.isPending} toggle={toggle} className={styles.cardCheck} />
+    </div>
   );
 }

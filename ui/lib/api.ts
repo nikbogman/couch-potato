@@ -116,6 +116,12 @@ export async function fetchSeason(id: string, season: number): Promise<EpisodeSu
   return ((await res.json()) as { episodes: EpisodeSummary[] }).episodes;
 }
 
+/** Mark one episode, or (no `episode`) every aired one in the season, watched or not. */
+export async function setWatched(id: number, season: number, watched: boolean, episode?: number) {
+  const res = await fetch(`/api/tv/${id}/season/${season}/watched`, { method: "PUT", body: JSON.stringify({ watched, episode }) });
+  if (!res.ok) throw new Error("Couldn't save");
+}
+
 /** The aired episode after this one: the rest of its season, else the first of the next season that has any. Null at the end. */
 export async function fetchNextEpisode(t: Extract<Target, { mediaType: "tv" }>): Promise<{ season: number; episode: number } | null> {
   const id = String(t.id);

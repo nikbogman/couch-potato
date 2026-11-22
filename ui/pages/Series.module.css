@@ -11,6 +11,7 @@
 
 /* Sticky under the app header, so the season stays in view while the list scrolls under it. */
 .tabs {
+  min-width: 0;
   position: sticky;
   top: var(--header-h);
   z-index: 1;
@@ -162,11 +163,89 @@
   text-overflow: ellipsis;
 }
 
+/* The episode row and its watched check beside it. */
+.rowWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.rowWrap .row {
+  flex: 1;
+  min-width: 0;
+}
+
 .check {
   flex: none;
   display: grid;
   width: 44px;
   height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.check:disabled,
+.cardCheck:disabled,
+.seasonMark:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* "Mark season watched", after the season chips. */
+.seasonMark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin-left: auto;
+  padding: 8px 18px 8px 12px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--veil-soft);
+  color: var(--text-soft);
+  font-size: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.seasonMark:focus-visible {
+  transform: scale(1.06);
+}
+
+/* TV card: the check sits on the still's top-right, shown on focus or hover, and always once watched. */
+.cardWrap {
+  position: relative;
+}
+
+.cardCheck {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--scrim);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 140ms;
+}
+
+.cardCheck svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cardWrap:hover .cardCheck,
+.cardWrap:focus-within .cardCheck,
+.cardCheck[aria-pressed="true"] {
+  opacity: 1;
 }
 
 .check svg {
@@ -227,6 +306,26 @@
   font-size: var(--text-md);
 }
 
+/* Phone: the chips get the full width, the season button sits on its own line under them. */
+:global(.remote) .pickerHead {
+  flex-wrap: wrap;
+}
+
+:global(.remote) .tabs {
+  flex-basis: 100%;
+}
+
+:global(.remote) .seasonMark {
+  margin-left: 0;
+  min-height: 36px;
+  padding: 4px 12px 4px 8px;
+  font-size: 14px;
+}
+
+:global(.remote) .rowWrap {
+  gap: var(--space-1);
+}
+
 :global(.remote) .check,
 :global(.remote) .cast {
   width: 32px;
@@ -236,6 +335,7 @@
 /* TV: "Episodes" with the season chips beside it, then a row of episode cards (designs: TV · Title). */
 .pickerHead {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: var(--space-2);
 }

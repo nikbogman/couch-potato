@@ -31,6 +31,8 @@ export function PlayButton({
   className?: string;
   autoFocus?: boolean;
   "data-episode"?: number;
+  "aria-keyshortcuts"?: string;
+  onKeyDown?: React.KeyboardEventHandler;
 }) {
   const remote = useRemote();
   const player = usePreferredPlayer(); // starts in the player chosen on the title page

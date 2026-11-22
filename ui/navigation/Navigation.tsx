@@ -16,7 +16,7 @@ const SETTLE_MS = 4000; // how long after a route change we keep looking for the
 /**
  * Keyboard and controller browsing for every TV screen, with the buttons console streaming apps use:
  * arrows and the d-pad/stick move focus spatially, A (✕) activates, B (○) goes back, Y (△) or "/" opens Search,
- * X (□) or Delete removes a Continue watching card, LB/RB (L1/R1) step through the header tabs, LT/RT (L2/R2) or PageUp/PageDown jump a page,
+ * X (□) or Delete removes a Continue watching card (on an episode: flips watched), LB/RB (L1/R1) step through the header tabs, LT/RT (L2/R2) or PageUp/PageDown jump a page,
  * Home/End jump along the row; Escape/Backspace (and the LG remote's Back) go back. Menu (OPTIONS) opens Controls.
  * The d-pad is turned into arrow keys, so a widget that handles arrows itself (season tabs) wins over the spatial move.
  * The player screen reads the pad itself; here it only gets arrow handling for its top bar. Not applied under /remote.
