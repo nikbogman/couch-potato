@@ -51,6 +51,16 @@
   max-width: 860px;
 }
 
+/* The hero is far wider than 16:9 is tall, so a covering backdrop lost its top and bottom. Here the whole still shows,
+   full height on the right, its left edge fading into the ground behind the text. */
+.compact .backdrop {
+  left: auto;
+  width: auto;
+  aspect-ratio: 16 / 9;
+  object-position: center;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 35%);
+}
+
 .compact .info {
   gap: 22px;
   max-width: 760px;
