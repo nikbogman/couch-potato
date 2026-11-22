@@ -93,6 +93,29 @@ export function createProgressStore(db: D1Like, userId: number, now: () => numbe
         .all<Row>();
       return results.map(toProgress);
     },
+    /**
+     * Mark episodes watched without playing them: a finished row (an existing one keeps its duration). Each gets a later
+     * timestamp than the one before, so the last in the list counts as the latest and Play moves on from it.
+     */
+    async markWatched(tmdbId: number, episodes: { season: number; episode: number }[]) {
+      const t = now();
+      for (const [i, e] of episodes.entries()) {
+        await db
+          .prepare(`insert into progress (user_id, media_type, tmdb_id, season, episode, position, duration, updated_at)
+            values (?1, 'tv', ?2, ?3, ?4, 1, 1, ?5)
+            on conflict (user_id, media_type, tmdb_id, ifnull(season, -1), ifnull(episode, -1))
+            do update set position = duration, updated_at = ?5, hidden = 0`)
+          .bind(userId, tmdbId, e.season, e.episode, t + i)
+          .run();
+      }
+    },
+    /** Forget an episode's progress, or a whole season's when `episode` is null. */
+    async unwatch(tmdbId: number, season: number, episode: number | null) {
+      await db
+        .prepare(`delete from progress where user_id = ?1 and media_type = 'tv' and tmdb_id = ?2 and season = ?3 and (?4 is null or episode = ?4)`)
+        .bind(userId, tmdbId, season, episode)
+        .run();
+    },
     /** Hide from Continue watching, keeping the progress. A series is hidden as a whole. False if there is nothing to hide. */
     async hide(k: ProgressKey): Promise<boolean> {
       const r =

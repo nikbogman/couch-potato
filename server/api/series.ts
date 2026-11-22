@@ -1,6 +1,6 @@
 import type { Progress } from "../progress/store";
 import type { TmdbTv } from "../tmdb/types";
-import { rating, tmdbError, type Ctx } from "./http";
+import { fail, noContent, notFound, rating, tmdbError, type Ctx } from "./http";
 import { nextEpisode, type Episode, type SeasonEpisodes } from "./nextEpisode";
 
 /** Real seasons in order. Specials (season 0) and seasons TMDB lists with no episodes yet are left out everywhere. */
@@ -55,6 +55,35 @@ export async function series(ctx: Ctx, id: string) {
         progress: saved && !saved.finished ? { position: saved.position, duration: saved.duration } : null,
       },
     });
+  } catch (status) {
+    return tmdbError(status);
+  }
+}
+
+/** PUT /api/tv/:id/season/:n/watched { watched: boolean, episode?: number }. No episode: every aired episode of the season. */
+export async function setWatched(ctx: Ctx, id: number, n: number, req: Request) {
+  let b: { watched?: unknown; episode?: unknown };
+  try {
+    b = (await req.json()) ?? {};
+  } catch {
+    return fail(400, "Invalid JSON");
+  }
+  const episode = b.episode ?? null;
+  if (typeof b.watched !== "boolean" || (episode !== null && !(Number.isInteger(episode) && (episode as number) >= 1))) {
+    return fail(400, "watched must be true or false, episode a whole number from 1");
+  }
+  if (!b.watched) {
+    await ctx.progress.unwatch(id, n, episode as number | null);
+    return noContent();
+  }
+  try {
+    const aired = (await ctx.tmdb.season(id, n))
+      .filter((e) => !!e.air_date && e.air_date <= ctx.today() && (episode === null || e.episode_number === episode))
+      .map((e) => e.episode_number)
+      .sort((a, b) => a - b);
+    if (!aired.length) return notFound();
+    await ctx.progress.markWatched(id, aired.map((e) => ({ season: n, episode: e })));
+    return noContent();
   } catch (status) {
     return tmdbError(status);
   }

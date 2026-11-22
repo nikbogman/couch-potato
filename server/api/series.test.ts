@@ -143,3 +143,29 @@ test("removing a series hides its card; watching again brings it back", async ()
   await saveEp(a, 10, 1, 2, 10);
   expect((await json(a, "/api/continue")).results.map((r: any) => r.episode)).toEqual([2]);
 });
+
+test("episodes and seasons can be marked watched and unwatched; Play moves past them", async () => {
+  const a = makeApi();
+  const put = (season: number, body: unknown) =>
+    a(new Request(`http://x/api/tv/10/season/${season}/watched`, { method: "PUT", body: JSON.stringify(body) }));
+  const watched = async (season: number) =>
+    (await json(a, `/api/tv/10/season/${season}`)).episodes.filter((e: any) => e.progress?.finished).map((e: any) => e.episode);
+
+  expect((await put(1, { watched: true, episode: 2 })).status).toBe(204);
+  expect(await watched(1)).toEqual([2]);
+  expect((await json(a, "/api/tv/10")).next).toEqual({ season: 1, episode: 3, progress: null });
+
+  await saveEp(a, 10, 1, 3, 30); // started, then marked: keeps its duration, now finished
+  expect((await put(1, { watched: true })).status).toBe(204);
+  expect(await watched(1)).toEqual([1, 2, 3]);
+  expect((await json(a, `/api/tv/10/season/1`)).episodes[2].progress.duration).toBe(100);
+  expect((await json(a, "/api/tv/10")).next.season).toBe(2);
+
+  await put(1, { watched: false, episode: 1 });
+  expect(await watched(1)).toEqual([2, 3]);
+  await put(1, { watched: false });
+  expect(await watched(1)).toEqual([]);
+
+  expect((await put(2, { watched: true, episode: 2 })).status).toBe(404); // not aired
+  expect((await put(1, { watched: "yes" })).status).toBe(400);
+});

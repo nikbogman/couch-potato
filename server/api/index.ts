@@ -5,7 +5,7 @@ import { notFound, type Ctx } from "./http";
 import { movie } from "./movie";
 import { continueWatching, getProgress, hide, saveProgress } from "./progress";
 import { search, trending, type MediaType } from "./search";
-import { season, series } from "./series";
+import { season, series, setWatched } from "./series";
 
 export type { SearchResult } from "./search";
 
@@ -33,6 +33,7 @@ export function createApi({
     if ((m = path.match(/^\/api\/movie\/(\d+)$/))) return movie(ctx, m[1]!);
     if ((m = path.match(/^\/api\/tv\/(\d+)$/))) return series(ctx, m[1]!);
     if ((m = path.match(/^\/api\/tv\/(\d+)\/season\/(\d+)$/))) return season(ctx, Number(m[1]), Number(m[2]));
+    if ((m = path.match(/^\/api\/tv\/(\d+)\/season\/(\d+)\/watched$/)) && req.method === "PUT") return setWatched(ctx, Number(m[1]), Number(m[2]), req);
     if (path === "/api/continue") return continueWatching(ctx);
     if ((m = path.match(/^\/api\/continue\/(movie|tv)\/(\d+)$/)) && req.method === "DELETE") return hide(ctx, m[1] as MediaType, Number(m[2]));
     if (path === "/api/progress") return req.method === "POST" ? saveProgress(ctx, req) : getProgress(ctx, url.searchParams);
