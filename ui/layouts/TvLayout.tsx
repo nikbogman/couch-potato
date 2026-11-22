@@ -50,7 +50,7 @@ export function TvLayout() {
         <div className={styles.left}>
           <span className={styles.wordmark} translate="no">
             <BrandMark size={40} />
-            {APP_NAME}
+            <span className="sr-only">{APP_NAME}</span>
           </span>
         </div>
         <nav aria-label="Main" className={styles.nav}>

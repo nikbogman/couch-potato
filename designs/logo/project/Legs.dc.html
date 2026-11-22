@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Legs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 720px; height: 440px; box-sizing: border-box; padding: 56px; background: #16181c; color: #f4f4f5; font-family: Inter, system-ui, sans-serif; display: flex; gap: 56px; align-items: center">
+<svg width="280" height="280" viewBox="0 0 32 32" role="img" aria-label="A potato standing on couch legs, the potato is the couch"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><path d="M6.5 16.5v3.5M17.5 16.5v3.5" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round"></path><path d="M3.5 11.6c0-3.4 3.8-5.6 8.6-5.6s8.4 2 8.4 5.3c0 3.4-3.8 5.4-8.6 5.4S3.5 15 3.5 11.6z" fill="#F5B544"></path><path d="M6.5 12.6c3.6 1.2 7.4 1.2 11 0" fill="none" stroke="#0b0c0e" stroke-width="1" stroke-linecap="round"></path><g fill="#0b0c0e"><circle cx="9" cy="9.4" r=".75"></circle><circle cx="15.2" cy="8.8" r=".65"></circle></g></g></svg>
+<div style="display: flex; flex-direction: column; gap: 48px; flex: 1">
+<div style="display: flex; align-items: flex-end; gap: 24px">
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="3"><svg width="{{s.px}}" height="{{s.px}}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><path d="M6.5 16.5v3.5M17.5 16.5v3.5" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round"></path><path d="M3.5 11.6c0-3.4 3.8-5.6 8.6-5.6s8.4 2 8.4 5.3c0 3.4-3.8 5.4-8.6 5.4S3.5 15 3.5 11.6z" fill="#F5B544"></path><path d="M6.5 12.6c3.6 1.2 7.4 1.2 11 0" fill="none" stroke="#0b0c0e" stroke-width="1" stroke-linecap="round"></path><g fill="#0b0c0e"><circle cx="9" cy="9.4" r=".75"></circle><circle cx="15.2" cy="8.8" r=".65"></circle></g></g></svg></sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><path d="M6.5 16.5v3.5M17.5 16.5v3.5" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round"></path><path d="M3.5 11.6c0-3.4 3.8-5.6 8.6-5.6s8.4 2 8.4 5.3c0 3.4-3.8 5.4-8.6 5.4S3.5 15 3.5 11.6z" fill="#F5B544"></path><path d="M6.5 12.6c3.6 1.2 7.4 1.2 11 0" fill="none" stroke="#0b0c0e" stroke-width="1" stroke-linecap="round"></path><g fill="#0b0c0e"><circle cx="9" cy="9.4" r=".75"></circle><circle cx="15.2" cy="8.8" r=".65"></circle></g></g></svg>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.02em">couch potato</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
+class Component extends DCLogic {
+renderVals() {
+return { sizes: [{ px: 64 }, { px: 32 }, { px: 16 }] };
+}
+}
+</script>
+</body>
+</html>

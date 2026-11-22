@@ -9,7 +9,7 @@ export const safeNext = (next: string | null | undefined, fallback = "/remote") 
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
 const mark = (size: number) =>
-  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7.2" fill="${MARK.ink}" stroke="rgb(255 255 255 / 0.12)" stroke-width="0.5"/><g transform="translate(4.08 4.08) scale(0.66)">${markPaths(MARK.amber, 2)}</g></svg>`;
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6.7" fill="${MARK.ink}" stroke="rgb(255 255 255 / 0.12)" stroke-width="0.5"/><g transform="translate(3 3) scale(0.75)">${markPaths()}</g></svg>`;
 
 /** The app's tokens (ui/styles.css), inlined: these pages are served before sign-in. */
 const BASE = `
@@ -19,7 +19,8 @@ const BASE = `
   a { color: #c9cbd0; }
   .muted { color: #9a9da4; }
   .notice { padding: 14px 16px; border-radius: 14px; background: #16181c; color: #c9cbd0; }
-  .error { color: #f28ab2; }`;
+  .error { color: #f28ab2; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }`;
 
 const page = (title: string, css: string, body: string, status = 200) =>
   new Response(
@@ -57,7 +58,7 @@ export function loginPage({ next, name = "", error = false, replaced = false }: 
     APP_NAME,
     FORM_CSS,
     `<main><div class="col">
-  <div class="brand">${mark(72)}<h1>${APP_NAME}</h1></div>
+  <div class="brand">${mark(72)}<h1 class="sr-only">${APP_NAME}</h1></div>
   ${replaced ? `<p class="notice" role="status">You signed in on another phone, so this one was signed out. Your TV is still paired.</p>` : ""}
   <form method="post" action="/login">
     <label>Name<input name="name" value="${esc(name)}" autocomplete="username" autocapitalize="none" required ${name ? "" : "autofocus"}></label>
@@ -137,7 +138,7 @@ export function pairPage({ origin, code, msLeft, replaced }: { origin: string; c
   return page(
     `Pair this TV · ${APP_NAME}`,
     PAIR_CSS,
-    `<div class="brand">${mark(40)}${APP_NAME}</div>
+    `<div class="brand">${mark(40)}<span class="sr-only">${APP_NAME}</span></div>
 ${replaced ? `<p class="banner" role="status">Signed out: your account was paired with another TV.</p>` : ""}
 <main>
   <div class="how">

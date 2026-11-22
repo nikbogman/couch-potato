@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blanket</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 720px; height: 440px; box-sizing: border-box; padding: 56px; background: #16181c; color: #f4f4f5; font-family: Inter, system-ui, sans-serif; display: flex; gap: 56px; align-items: center">
+<svg width="280" height="280" viewBox="0 0 32 32" role="img" aria-label="A potato tucked under a striped blanket"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><ellipse cx="12" cy="9.5" rx="5.4" ry="4.4" fill="#F5B544"></ellipse><g fill="#0b0c0e"><circle cx="10.2" cy="9" r=".75"></circle><circle cx="13.8" cy="8.6" r=".75"></circle></g><path d="M2.5 20.5V14c3.2-2.4 6.2-1.4 9.5-1.4s6.3-1 9.5 1.4v6.5z" fill="#f4f4f5"></path><path d="M2.5 16.4c3.2-1.8 6.2-1 9.5-1s6.3-.8 9.5 1M2.5 18.6c3.2-1.6 6.2-.9 9.5-.9s6.3-.7 9.5.9" fill="none" stroke="#F5B544" stroke-width="1"></path></g></svg>
+<div style="display: flex; flex-direction: column; gap: 48px; flex: 1">
+<div style="display: flex; align-items: flex-end; gap: 24px">
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="3"><svg width="{{s.px}}" height="{{s.px}}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><ellipse cx="12" cy="9.5" rx="5.4" ry="4.4" fill="#F5B544"></ellipse><g fill="#0b0c0e"><circle cx="10.2" cy="9" r=".75"></circle><circle cx="13.8" cy="8.6" r=".75"></circle></g><path d="M2.5 20.5V14c3.2-2.4 6.2-1.4 9.5-1.4s6.3-1 9.5 1.4v6.5z" fill="#f4f4f5"></path><path d="M2.5 16.4c3.2-1.8 6.2-1 9.5-1s6.3-.8 9.5 1M2.5 18.6c3.2-1.6 6.2-.9 9.5-.9s6.3-.7 9.5.9" fill="none" stroke="#F5B544" stroke-width="1"></path></g></svg></sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><ellipse cx="12" cy="9.5" rx="5.4" ry="4.4" fill="#F5B544"></ellipse><g fill="#0b0c0e"><circle cx="10.2" cy="9" r=".75"></circle><circle cx="13.8" cy="8.6" r=".75"></circle></g><path d="M2.5 20.5V14c3.2-2.4 6.2-1.4 9.5-1.4s6.3-1 9.5 1.4v6.5z" fill="#f4f4f5"></path><path d="M2.5 16.4c3.2-1.8 6.2-1 9.5-1s6.3-.8 9.5 1M2.5 18.6c3.2-1.6 6.2-.9 9.5-.9s6.3-.7 9.5.9" fill="none" stroke="#F5B544" stroke-width="1"></path></g></svg>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.02em">couch potato</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
+class Component extends DCLogic {
+renderVals() {
+return { sizes: [{ px: 64 }, { px: 32 }, { px: 16 }] };
+}
+}
+</script>
+</body>
+</html>

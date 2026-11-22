@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slump</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 720px; height: 440px; box-sizing: border-box; padding: 56px; background: #16181c; color: #f4f4f5; font-family: Inter, system-ui, sans-serif; display: flex; gap: 56px; align-items: center">
+<svg width="280" height="280" viewBox="0 0 32 32" role="img" aria-label="A figure slumped back with feet up"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><circle cx="6.2" cy="7.2" r="2.4" fill="#F5B544"></circle><path d="M7.4 11.4c.9 3.6 2.4 5.1 5.6 5.1h1.6l5.4-3.4" fill="none" stroke="#F5B544" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 20h18" stroke="#f4f4f5" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"></path></g></svg>
+<div style="display: flex; flex-direction: column; gap: 48px; flex: 1">
+<div style="display: flex; align-items: flex-end; gap: 24px">
+<sc-for list="{{sizes}}" as="s" hint-placeholder-count="3"><svg width="{{s.px}}" height="{{s.px}}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><circle cx="6.2" cy="7.2" r="2.4" fill="#F5B544"></circle><path d="M7.4 11.4c.9 3.6 2.4 5.1 5.6 5.1h1.6l5.4-3.4" fill="none" stroke="#F5B544" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 20h18" stroke="#f4f4f5" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"></path></g></svg></sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 14px">
+<svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#0b0c0e"></rect><g transform="translate(4 4)"><circle cx="6.2" cy="7.2" r="2.4" fill="#F5B544"></circle><path d="M7.4 11.4c.9 3.6 2.4 5.1 5.6 5.1h1.6l5.4-3.4" fill="none" stroke="#F5B544" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3 20h18" stroke="#f4f4f5" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"></path></g></svg>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.02em">couch potato</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
+class Component extends DCLogic {
+renderVals() {
+return { sizes: [{ px: 64 }, { px: 32 }, { px: 16 }] };
+}
+}
+</script>
+</body>
+</html>
