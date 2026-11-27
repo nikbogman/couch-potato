@@ -3,6 +3,7 @@ import { PageMessage } from "./components/Status";
 import { RemoteLayout } from "./layouts/RemoteLayout";
 import { TvLayout } from "./layouts/TvLayout";
 import { Navigation } from "./navigation/Navigation";
+import { Find } from "./pages/Find";
 import { Home } from "./pages/Home";
 import { Invite } from "./pages/Invite";
 import { Lists } from "./pages/Lists";
@@ -26,6 +27,7 @@ export function App() {
         <Route path="/remote" element={<RemoteLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<Search />} />
+          <Route path="find" element={<Find />} />
           <Route path="lists" element={<Lists />} />
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<Movie />} />
