@@ -4,7 +4,7 @@ import { transform } from "esbuild";
 import { transform as css } from "lightningcss";
 import { readdir } from "node:fs/promises";
 
-const dist = new URL("../dist/", import.meta.url).pathname;
+const dist = import.meta.dir + "/../dist/";
 const run = Bun.spawnSync(["bun", "build", "ui/index.html", "--env", "PUBLIC_*", "--outdir", "dist", "--minify", "--public-path", "/", "--asset-naming", "[name].[ext]"], { stdio: ["inherit", "inherit", "inherit"] });
 if (run.exitCode) process.exit(run.exitCode);
 
