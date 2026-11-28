@@ -86,6 +86,14 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
  */
 export function placeFocus(el: HTMLElement) {
   el.focus({ preventScroll: true, focusVisible: true } as FocusOptions);
+  // In a card row, slide the row so the card shows (episode 9 of 10 would otherwise sit off-screen right).
+  const track = el.closest<HTMLElement>("[data-track]");
+  const item = track && [...track.children].find((c) => c.contains(el));
+  if (track && item) {
+    const edge = track.getBoundingClientRect().left;
+    const box = item.getBoundingClientRect();
+    track.scrollLeft = revealX({ left: box.left - edge, right: box.right - edge, view: track.clientWidth, scrollLeft: track.scrollLeft, max: track.scrollWidth - track.clientWidth });
+  }
   const r = el.getBoundingClientRect();
   const top = document.querySelector<HTMLElement>("[data-app-header]")?.offsetHeight ?? 0;
   const by = r.bottom > innerHeight ? r.bottom - innerHeight + PLACE_GAP : r.top < top ? r.top - top - PLACE_GAP : 0;
