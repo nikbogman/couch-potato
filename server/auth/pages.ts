@@ -1,5 +1,6 @@
 // The pages served before sign-in: sign in (phone), pair (TV) and join (invite). Self-contained (inline CSS and script, no app bundle).
 import { renderSVG } from "uqr";
+import { legacyCss } from "../../shared/legacy-css";
 import { APP_NAME, markSvg } from "../../shared/brand";
 import { MIN_PASSWORD } from "./accounts";
 
@@ -21,6 +22,9 @@ const BASE = `
   .error { color: #f28ab2; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }`;
 
+const styled = new Map<string, string>();
+const legacy = (css: string) => styled.get(css) ?? (styled.set(css, legacyCss(css, true)), styled.get(css)!);
+
 const page = (title: string, css: string, body: string, status = 200) =>
   new Response(
     `<!doctype html>
@@ -28,7 +32,7 @@ const page = (title: string, css: string, body: string, status = 200) =>
 <title>${esc(title)}</title>
 <link rel="icon" href="/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-<style>${BASE}${css}</style></head>
+<style>${legacy(BASE + css)}</style></head>
 <body>${body}</body></html>`,
     { status, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } },
   );
