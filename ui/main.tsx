@@ -1,3 +1,6 @@
+// Chromium 79 (2021 LG webOS) lacks String.replaceAll, which the bundled dependencies call.
+if (!String.prototype.replaceAll) String.prototype.replaceAll = function (this: string, a: string | RegExp, b: never) { return a instanceof RegExp ? this.replace(a, b) : this.split(a).join(b as string); } as typeof String.prototype.replaceAll;
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";

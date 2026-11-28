@@ -437,3 +437,12 @@
   background: var(--text);
   color: var(--ink);
 }
+
+/* No aspect-ratio on Chromium 79 (2021 LG webOS): a padding spacer holds the 16:9 box open. */
+@supports not (aspect-ratio: 1) {
+  .still::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%;
+  }
+}

@@ -206,3 +206,15 @@
 :global(.remote) .meta {
   margin-top: calc(-1 * var(--space-1));
 }
+
+/* Chromium 79 (2021 LG webOS) has no aspect-ratio: a padding spacer holds the box open instead. */
+@supports not (aspect-ratio: 1) {
+  .poster::before {
+    content: "";
+    display: block;
+    padding-top: 150%;
+  }
+  .poster.landscape::before {
+    padding-top: 56.25%;
+  }
+}
