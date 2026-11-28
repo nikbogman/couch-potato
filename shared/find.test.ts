@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { SearchResult } from "./api";
+import type { SearchResult } from "../server/api";
 import { bestMatch } from "./find";
 
 const r = (id: number, mediaType: "movie" | "tv", year: string | null): SearchResult => ({ id, mediaType, title: "x", year, posterPath: null });

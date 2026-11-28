@@ -1,3 +1,4 @@
+import type { Tmdb } from "../tmdb/client";
 import type { TmdbItem } from "../tmdb/types";
 import { fail, type Ctx } from "./http";
 
@@ -32,6 +33,10 @@ async function results(ctx: Ctx, path: string, params: Record<string, string>, f
     return fail(502, "TMDB request failed");
   }
 }
+
+/** TMDB's multi search, movies and shows only. Throws like `Tmdb`. */
+export const searchTitles = async (tmdb: Tmdb, q: string) =>
+  (await tmdb.list("/search/multi", { query: q, include_adult: "false" })).map((i) => toResult(i)).filter((r) => r !== null);
 
 /** GET /api/search?q= */
 export const search = (ctx: Ctx, q: string) =>

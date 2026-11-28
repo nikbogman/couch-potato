@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { PageMessage } from "../components/Status";
 import { searchTitles } from "../lib/api";
-import { bestMatch } from "../lib/find";
+import { bestMatch } from "../../shared/find";
 
 /**
  * /remote/find?title=&year=&type=movie|tv: a deep link for other apps (unreel)
